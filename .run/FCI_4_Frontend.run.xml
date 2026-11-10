@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="4. Frontend (next dev, :3000)" type="js.build_tools.npm" folderName="FCI local">
+    <package-json value="$PROJECT_DIR$/frontend/package.json" />
+    <command value="run" />
+    <scripts>
+      <script value="dev" />
+    </scripts>
+    <node-interpreter value="project" />
+    <envs>
+      <env name="BACKEND_URL" value="http://127.0.0.1:8180/api" />
+      <env name="FCI_DEV_BACKEND_URL" value="http://127.0.0.1:8180" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>

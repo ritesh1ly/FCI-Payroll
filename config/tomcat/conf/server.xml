@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Hardened server.xml for Apache Tomcat 11.0.27 (Servlet 6.1, JDK 25) running the FCILekha Payroll backend WAR
+  (/api) (ADR-0016). Install as $CATALINA_BASE/conf/server.xml of each instance: one CATALINA_HOME,
+  two CATALINA_BASEs, "online" (ports 8080/8081) and "batch" (ports 8090/8091).
+
+  ${fci.*} values come from system properties set in bin/setenv.sh:
+    fci.http.address    application connector bind address (127.0.0.1: only NGINX on this host)
+    fci.http.port       application connector port (online 8080, batch 8090)
+    fci.mgmt.port       management connector port (online 8081, batch 8091; Actuator only, never proxied)
+
+  Removed compared with the stock file: shutdown port, AJP, the UserDatabase realm and the default
+  webapps. Each WAR is deployed only through its descriptor in conf/Catalina/localhost/.
+-->
+<Server port="-1" shutdown="SHUTDOWN">
+  <!-- logArgs=false: JVM arguments are not written to catalina.out. -->
+  <Listener className="org.apache.catalina.startup.VersionLoggerListener" logArgs="false" logEnv="false" logProps="false"/>
+  <!-- Refuses to start as root and enforces a restrictive umask (logs, H2 files, temp files). -->
+  <Listener className="org.apache.catalina.security.SecurityListener" checkedOsUsers="root" minimumUmask="0007"/>
+  <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener"/>
+  <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener"/>
+
+  <Service name="Catalina">
+    <!--
+      Application connector. Only NGINX (TLS terminator) and the Next.js server (server-side rendering)
+      connect, both over loopback. The batch instance's connector answers 404 for everything but Actuator.
+      Requests run on virtual threads (JDK 25; useVirtualThreads): concurrency stays bounded by
+      maxConnections and the database pool, and a blocking JDBC call no longer holds a platform thread.
+      Multipart limits are explicit (Tomcat 11 has a default part count): one file plus a few fields
+      per upload (fci.documents), so 10 parts and 512-byte part headers. Compression is off: NGINX compresses static files,
+      and API responses are never compressed (BREACH, and strong ETags must reach the browser intact
+      for If-Match).
+    -->
+    <Connector address="${fci.http.address}"
+               port="${fci.http.port}"
+               protocol="HTTP/1.1"
+               maxConnections="2000"
+               acceptCount="200"
+               connectionTimeout="10000"
+               keepAliveTimeout="20000"
+               maxKeepAliveRequests="500"
+               maxHttpHeaderSize="16384"
+               maxPostSize="1048576"
+               maxParameterCount="100"
+               maxSwallowSize="1048576"
+               useVirtualThreads="true"
+               maxPartCount="10"
+               maxPartHeaderSize="512"
+               compression="off"
+               allowTrace="false"
+               xpoweredBy="false"
+               server=" "
+               URIEncoding="UTF-8"
+               encodedSolidusHandling="reject"
+               relaxedPathChars=""
+               relaxedQueryChars=""/>
+
+    <!-- Management connector: Actuator only (ManagementPortFilter checks the local port). -->
+    <Connector address="127.0.0.1"
+               port="${fci.mgmt.port}"
+               protocol="HTTP/1.1"
+               maxConnections="50"
+               connectionTimeout="5000"
+               maxHttpHeaderSize="8192"
+               maxPostSize="0"
+               allowTrace="false"
+               xpoweredBy="false"
+               server=" "/>
+
+    <Engine name="Catalina" defaultHost="localhost">
+      <!--
+        appBase is a dedicated, empty directory: even if the stock webapps (ROOT, manager, docs,
+        examples, host-manager) were left in webapps/, nothing is deployed from there. deployXML=false
+        ignores META-INF/context.xml inside the WARs; only the reviewed descriptors in
+        conf/Catalina/localhost apply.
+      -->
+      <Host name="localhost"
+            appBase="webapps-fci"
+            unpackWARs="true"
+            autoDeploy="false"
+            deployOnStartup="true"
+            deployXML="false"
+            failCtxIfServletStartFails="true">
+
+        <!--
+          Access log: client IP as resolved by the per-context RemoteIpValve (requestAttributesEnabled),
+          correlation id from NGINX, duration in ms (%{ms}T). Kept 180 days (CERT-In). Query strings are not
+          logged (%U, not %r): they can carry search terms or e-mail addresses.
+        -->
+        <Valve className="org.apache.catalina.valves.AccessLogValve"
+               directory="logs"
+               prefix="access."
+               suffix=".log"
+               fileDateFormat="yyyy-MM-dd"
+               maxDays="180"
+               requestAttributesEnabled="true"
+               encoding="UTF-8"
+               pattern="%{yyyy-MM-dd'T'HH:mm:ss.SSSZ}t %a %{local}p &quot;%m %U %H&quot; %s %b %{ms}T &quot;%{X-Correlation-Id}i&quot; &quot;%{User-Agent}i&quot;"/>
+
+        <!-- No stack traces, no version banner in error pages. -->
+        <Valve className="org.apache.catalina.valves.ErrorReportValve"
+               showReport="false"
+               showServerInfo="false"/>
+      </Host>
+    </Engine>
+  </Service>
+</Server>

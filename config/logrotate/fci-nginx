@@ -1,0 +1,20 @@
+# /etc/logrotate.d/fci-nginx: NGINX access and error logs of FCILekha Payroll.
+# CERT-In (Directions of 28 April 2022): ICT system logs are kept for 180 days, within India.
+# Tomcat access logs (AccessLogValve maxDays=180) and the application logs (logback, 180 days)
+# rotate themselves.
+/var/log/nginx/fci-access.json /var/log/nginx/error.log {
+    daily
+    rotate 180
+    maxage 180
+    dateext
+    dateformat -%Y-%m-%d
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 nginx adm
+    sharedscripts
+    postrotate
+        [ -s /run/nginx.pid ] && kill -USR1 "$(cat /run/nginx.pid)"
+    endscript
+}

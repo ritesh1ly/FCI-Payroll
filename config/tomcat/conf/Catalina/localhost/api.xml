@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  FCILekha Payroll backend context (/api). Install as $CATALINA_BASE/conf/Catalina/localhost/api.xml
+  in BOTH Tomcat instances: the same WAR runs as "online" and as "batch"; ${fci.mode} (setenv) picks
+  the Spring profile. The WAR lives outside appBase (ADR-0016); install-release.sh switches
+  ${fci.apps.dir}/current.
+-->
+<Context docBase="${fci.apps.dir}/current/fci-payroll.war"
+         reloadable="false"
+         crossContext="false"
+         privileged="false"
+         swallowAbortedUploads="false"
+         mapperContextRootRedirectEnabled="false"
+         mapperDirectoryRedirectEnabled="false"
+         useHttpOnly="true">
+
+  <!--
+    The client address and scheme come from the trusted proxies on this host (${fci.proxies}, a
+    regular expression): NGINX, and the Next.js server for its server-side calls. NGINX overwrites
+    X-Forwarded-For with $remote_addr, so a client cannot smuggle an address in. Sign-in throttling
+    and the audit trail depend on this. request.getLocalPort() is not changed, so the
+    management-port check still works.
+  -->
+  <Valve className="org.apache.catalina.valves.RemoteIpValve"
+         remoteIpHeader="X-Forwarded-For"
+         protocolHeader="X-Forwarded-Proto"
+         protocolHeaderHttpsValue="https"
+         internalProxies="${fci.proxies}"
+         changeLocalPort="false"
+         requestAttributesEnabled="true"/>
+
+  <!-- Per-instance configuration (ADR-0013): never shared through JVM-wide Spring properties. -->
+  <Parameter name="spring.profiles.active" value="${fci.profile},${fci.mode}" override="false"/>
+  <Parameter name="spring.config.additional-location" value="optional:file:${fci.config.dir}/backend/" override="false"/>
+
+  <!--
+    Spring Boot WAR: nothing in WEB-INF/lib needs Tomcat's start-up scans. defaultTldScan="false":
+    no JSP tag libraries. defaultPluggabilityScan="false": no @WebServlet / @HandlesTypes scan of
+    the library jars (Tomcat otherwise reads the bytecode of every class of every jar, about a
+    minute for this WAR). The Spring Boot initializer (FciPayrollApplication) is in
+    WEB-INF/classes, which Tomcat still scans; the ServletContainerInitializer of spring-web is
+    found through its service file either way. No class-path or manifest scan either.
+  -->
+  <JarScanner scanClassPath="false" scanManifest="false">
+    <JarScanFilter defaultTldScan="false" defaultPluggabilityScan="false"/>
+  </JarScanner>
+</Context>

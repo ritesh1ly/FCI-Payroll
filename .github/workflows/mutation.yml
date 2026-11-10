@@ -1,0 +1,107 @@
+# Mutation testing, by hand only (Actions > mutation > Run workflow): backend PIT (jobs pit-modules / pit, moved here
+# from ci.yml by OD-161, owner 2026-11-09: "I am using free tier, make PIT mutation check disabled for build") and
+# frontend Stryker (jobs shards / stryker). Each module is its own job; a module below 95 % fails the run.
+# Frontend mutation testing (Stryker), sharded per module (OD-155, owner 2026-11-09): one job per
+# src/modules/<m>/business, each `npm run mutation:shards -- --only <m> --force` with the thresholds of
+# frontend/stryker.config.json (break 95 % per shard). A shard below the gate fails the run.
+# When: nightly (cron below, 19:30 UTC = 01:00 IST), on every pull request into feature/Oracle, and by hand
+# (Actions > mutation > Run workflow). Not on every push: one full run is about 5 hours on one machine
+# (docs/quality/QUALITY_GATES.md "Mutation runs, sharded"). Backend PIT runs on every push in ci.yml (job pit).
+name: mutation
+
+# Owner 2026-11-09 (OD-156): "for now do not run frontend PIT mutation": manual only until the owner turns the
+# nightly and pull-request triggers back on (they were: schedule cron "30 19 * * *", pull_request into feature/Oracle).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mutation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shards:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      modules: ${{ steps.list.outputs.modules }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        name: Modules with business rules
+        run: |
+          modules=$(ls -d frontend/src/modules/*/business | awk -F/ '{print $(NF-1)}' | jq -R . | jq -cs .)
+          echo "modules=$modules" >> "$GITHUB_OUTPUT"
+
+  stryker:
+    needs: shards
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.shards.outputs.modules) }}
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Stryker ${{ matrix.module }} (break 95 %)
+        run: npm run mutation:shards -- --only ${{ matrix.module }} --force --budget 100%
+      - name: Mutation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stryker-${{ matrix.module }}
+          path: frontend/reports/mutation/shards/${{ matrix.module }}/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  pit-modules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      modules: ${{ steps.list.outputs.modules }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        name: Modules with business rules
+        run: |
+          modules=$(ls -d backend/src/main/java/in/gov/fci/payroll/*/business | awk -F/ '{print $(NF-1)}' | jq -R . | jq -cs .)
+          echo "modules=$modules" >> "$GITHUB_OUTPUT"
+  pit:
+    needs: pit-modules
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.pit-modules.outputs.modules) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: PIT ${{ matrix.module }} (gate fci.pitest.min-mutation)
+        run: python scripts/quality/pit_shards.py --only ${{ matrix.module }} --force --budget 100%
+      - name: PIT report
+        if: failure() # storage quota (owner 2026-11-09): reports only when a job fails
+        uses: actions/upload-artifact@v4
+        with:
+          name: pit-${{ matrix.module }}
+          path: backend/build/reports/pitest-shards/${{ matrix.module }}/
+          if-no-files-found: ignore
+          retention-days: 3

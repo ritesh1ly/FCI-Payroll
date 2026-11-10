@@ -1,0 +1,73 @@
+{
+  // Debugging FCILekha Payroll locally (needs the Extension Pack for Java).
+  //
+  // From source (Gradle, embedded Tomcat), the same WAR code as two processes on one H2 server:
+  //   "Backend online"  starts H2 + :backend:bootRunOnline and attaches to JDWP 5005
+  //   "Backend batch"   starts :backend:bootRunBatch (after online is ready), attaches to JDWP 5006
+  //   "Frontend"        next dev on http://localhost:3000 (/api -> online on 8180)
+  //   "Full stack"      all three
+  // Deployed in the local Tomcat 10.1 instances (scripts/local/deploy-local.ps1 -Jpda):
+  //   "Attach: Tomcat online" (JPDA 8000), "Attach: Tomcat batch" (JPDA 8001)
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Backend online (debug, :8180)",
+      "type": "java",
+      "request": "attach",
+      "hostName": "127.0.0.1",
+      "port": 5005,
+      "projectName": "backend",
+      "preLaunchTask": "fci: backend online"
+    },
+    {
+      "name": "Backend batch (debug, :8190)",
+      "type": "java",
+      "request": "attach",
+      "hostName": "127.0.0.1",
+      "port": 5006,
+      "projectName": "backend",
+      "preLaunchTask": "fci: backend batch"
+    },
+    {
+      "name": "Frontend (next dev, :3000)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "env": {
+        "BACKEND_URL": "http://127.0.0.1:8180/api",
+        "FCI_DEV_BACKEND_URL": "http://127.0.0.1:8180"
+      },
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Attach: Tomcat online (JPDA 8000)",
+      "type": "java",
+      "request": "attach",
+      "hostName": "127.0.0.1",
+      "port": 8000,
+      "projectName": "backend"
+    },
+    {
+      "name": "Attach: Tomcat batch (JPDA 8001)",
+      "type": "java",
+      "request": "attach",
+      "hostName": "127.0.0.1",
+      "port": 8001,
+      "projectName": "backend"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full stack (online + batch + frontend)",
+      "configurations": [
+        "Backend online (debug, :8180)",
+        "Backend batch (debug, :8190)",
+        "Frontend (next dev, :3000)"
+      ],
+      "stopAll": true
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "_comment": "Mutation testing of the business rules (the frontend's twin of PIT on *.business.*), killed by their unit tests (tests/unit/*-rules.test.ts, vitest.mutation.config.ts). Hard gate 95 % (break), recommendation 100 %, as revised by the project owner on 2026-11-03 (docs/quality/QUALITY_GATES.md).",
+  "testRunner_comment": "The command runner, not @stryker-mutator/vitest-runner 10.0.0: under Vitest 5 that runner reported every runtime mutant 'survived' with 0 tests (only the static mutants, which reload the environment, were killed), because its in-process runs keep the dry run's provided context. The command runner starts Vitest once per mutant with __STRYKER_ACTIVE_MUTANT__ set, which the instrumented code reads (developer playbook, learnings log 2026-10-23). Return to the vitest runner with 'perTest' once a release supports Vitest 5, after checking that killed mutants report their tests.",
+  "packageManager": "npm",
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "npx vitest run --config vitest.mutation.config.ts"
+  },
+  "coverageAnalysis": "off",
+  "concurrency_comment": "Four mutant runs side by side (owner's CPU rule, 2026-11-08), each with one Vitest worker (vitest.mutation.config.ts): Stryker's default (cores - 1) times Vitest's own pool held the CPU at 90 %. Day to day use npm run mutation:shards (scripts/mutation-shards.mjs: one shard per module, only its tests, one CPU budget, unchanged shards skipped); this full run stays for a release and after a tooling change (docs/quality/QUALITY_GATES.md).",
+  "concurrency": 4,
+  "mutate": ["src/modules/*/business/**/*.ts"],
+  "thresholds": {
+    "high": 100,
+    "low": 95,
+    "break": 95
+  },
+  "reporters": ["clear-text", "progress", "html", "json"],
+  "htmlReporter": {
+    "fileName": "reports/mutation/mutation.html"
+  },
+  "jsonReporter": {
+    "fileName": "reports/mutation/mutation.json"
+  },
+  "incremental_comment": "A rerun tests only the mutants whose code or tests changed since the last run (history in reports/mutation, git-ignored; a clean checkout, as on CI, runs everything). Force a full run with --force - and ALWAYS after adding tests to kill survivors: with the command runner and coverageAnalysis off, Stryker cannot see which tests cover a mutant, so it reuses an old Survived result while the mutant code is unchanged, even if the tests changed (2026-10-24). Narrow it to the file: --mutate <file> --force.",
+  "incremental": true,
+  "incrementalFile": "reports/mutation/stryker-incremental.json",
+  "tempDirName": ".stryker-tmp",
+  "cleanTempDir": "always",
+  "timeout_comment": "Generous timeouts (owner 2026-11-03): under load the default factor counted slow mutants as Timeout (a kill) that a re-run let survive; only a real infinite loop may time out.",
+  "timeoutMS": 60000,
+  "timeoutFactor": 3
+}

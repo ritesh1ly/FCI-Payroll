@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[Product Name] — Payroll Management System · Login (Wireframe)</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&family=DM+Serif+Display:ital@1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#17693A; --green-2:#1F8048; --green-soft:#E3F2E7; --mint:#EEF7F0;
+  --navy:#16284A; --navy-2:#1E3560; --gold:#D6A531; --gold-soft:#FBF1D6;
+  --ink:#1A2433; --body:#4A5568; --muted:#7A8596; --line:#D7DEE6; --white:#fff; --red:#C53B3B;
+  --disp:"Plus Jakarta Sans",system-ui,sans-serif; --sans:"Inter",system-ui,sans-serif; --serif:"DM Serif Display",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);color:var(--body);background:#F4FAF5;-webkit-font-smoothing:antialiased;overflow-x:clip}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:8px}
+
+/* prototype ribbon */
+.ribbon{position:fixed;top:0;left:0;right:0;z-index:50;background:var(--navy);color:#DCE4F0;font-size:12.5px;text-align:center;padding:7px 12px;letter-spacing:.02em}
+.ribbon b{color:var(--gold)}
+
+.page{position:relative;min-height:100vh;padding-top:32px;overflow:hidden;
+  background:radial-gradient(900px 600px at 15% 20%,#FFFFFF 0%,rgba(255,255,255,0) 60%),linear-gradient(120deg,#F7FBF8 0%,#EAF5EC 100%)}
+/* soft blob behind card */
+.blob{position:absolute;right:-8%;top:-12%;width:62%;height:120%;border-radius:48% 0 0 52%/60% 0 0 40%;background:linear-gradient(160deg,#DDEFE1,#CFE7D5);z-index:0}
+.leaves{position:absolute;right:-30px;top:20px;width:340px;opacity:.55;z-index:0;pointer-events:none}
+.waves{position:absolute;left:0;right:0;bottom:0;height:150px;z-index:1;pointer-events:none}
+.waves svg{width:100%;height:100%;display:block}
+
+.grid{position:relative;z-index:2;max-width:1360px;margin:0 auto;padding:40px 48px 150px;display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center;min-height:calc(100vh - 32px)}
+.grid>*{min-width:0}
+
+/* brand */
+.brand{display:flex;align-items:center;gap:18px}
+.brand .mark{width:74px;height:74px;border-radius:18px;background:#fff;border:1.5px solid #CFE3D5;display:grid;place-items:center;box-shadow:0 10px 24px -14px rgba(23,105,58,.5)}
+.brand .mark svg{width:40px;height:40px}
+.brand .nm{font-family:var(--disp);font-weight:800;font-size:40px;color:var(--green);letter-spacing:-.03em;line-height:1}
+.brand .nm span{font-weight:500}
+.brand .org{font-size:13.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--green);margin-top:8px;font-weight:600}
+.placeholder{outline:1.5px dashed rgba(214,165,49,.8);outline-offset:4px;border-radius:6px}
+
+/* headline */
+h1{margin:30px 0 0 30px;font-family:var(--disp);font-weight:800;color:var(--navy);font-size:clamp(58px,7vw,104px);letter-spacing:-.045em;line-height:.92}
+h1 .sub{display:block;font-family:var(--serif);font-style:italic;font-weight:400;font-size:.62em;letter-spacing:-.01em;margin:6px 0 0 1.6em;color:var(--navy)}
+h1 .sub em{color:var(--green);position:relative;font-style:italic}
+h1 .sub em::after{content:"";position:absolute;left:8%;right:-4%;bottom:-.08em;height:.16em;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14'%3E%3Cpath d='M2 10 C60 2 140 2 198 8' fill='none' stroke='%23D6A531' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center/100% 100%}
+.lede{margin:26px 0 0 104px;font-size:20px;line-height:1.5;color:#55606F;max-width:470px}
+
+/* features */
+.feats{display:grid;grid-template-columns:repeat(4,1fr);margin:26px 0 0 30px;max-width:620px}
+.ft{display:grid;justify-items:center;text-align:center;gap:10px;padding:0 10px;border-left:1px solid #D3DED6;font-size:15px;color:var(--ink);line-height:1.25;font-weight:500}
+.ft:first-child{border-left:0}
+.ft i{width:66px;height:66px;border-radius:50%;display:grid;place-items:center;transition:transform .25s}
+.ft:hover i{transform:translateY(-4px)}
+.ft svg{width:30px;height:30px}
+
+/* laptop mockup (pure CSS) */
+.scene{position:relative;margin:30px 0 0 0;width:min(720px,100%);aspect-ratio:700/430}
+#sceneSvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%)}
+.laptop{position:absolute;left:50%;bottom:13.5%;width:560px;perspective:1400px;transform-origin:50% 100%;transform:translateX(-50%) scale(var(--k,.75))}
+.screen{position:relative;border-radius:16px 16px 4px 4px;background:#1C1F26;padding:10px;transform:rotateX(4deg) rotateY(8deg);transform-origin:bottom;box-shadow:0 30px 60px -24px rgba(22,40,74,.45)}
+.app{background:#F5F7FA;border-radius:6px;overflow:hidden;display:grid;grid-template-columns:110px 1fr;height:250px;font-size:8.5px;color:var(--ink)}
+.app .top{grid-column:1/-1;display:flex;align-items:center;gap:8px;background:#fff;padding:7px 10px;border-bottom:1px solid #E6EBF1;font-weight:700;font-size:9.5px}
+.app .top b{color:var(--green);font-family:var(--disp)}
+.side{background:var(--navy);color:#C8D3E5;padding:8px 6px;display:grid;align-content:start;gap:3px}
+.side span{padding:5px 7px;border-radius:5px}
+.side span.on{background:rgba(255,255,255,.12);color:#fff}
+.main{padding:8px;display:grid;grid-template-rows:auto 1fr;gap:7px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.kpi{background:#fff;border-radius:6px;padding:6px;display:flex;gap:5px;align-items:center;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.kpi i{width:16px;height:16px;border-radius:4px;flex:none}
+.kpi b{display:block;font-size:10px}
+.kpi small{color:var(--muted);font-size:7px}
+.charts{display:grid;grid-template-columns:1.2fr 1fr;gap:6px}
+.card{background:#fff;border-radius:6px;padding:7px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.card h6{font-size:8px;margin-bottom:5px}
+.bars{display:flex;align-items:flex-end;gap:5px;height:90px;border-bottom:1px solid #E6EBF1;padding:0 4px}
+.bars div{flex:1;display:flex;gap:2px;align-items:flex-end;height:100%}
+.bars i{flex:1;border-radius:2px 2px 0 0;background:var(--green);animation:grow 1.2s cubic-bezier(.2,.8,.2,1) backwards}
+.bars i+i{background:var(--gold)}
+@keyframes grow{from{height:0}}
+.donut{display:flex;gap:8px;align-items:center}
+.donut svg{width:70px;height:70px;flex:none}
+.legend{display:grid;gap:3px;font-size:7px}
+.legend span::before{content:"";display:inline-block;width:6px;height:6px;border-radius:2px;margin-right:4px;background:var(--c)}
+.base{height:14px;margin:0 -28px;border-radius:0 0 14px 14px;background:linear-gradient(180deg,#D7DBE2,#A9B0BC);box-shadow:0 18px 30px -12px rgba(22,40,74,.4)}
+.base::after{content:"";display:block;width:90px;height:5px;margin:0 auto;border-radius:0 0 6px 6px;background:#9AA1AD}
+.illus{position:absolute;right:0;top:-18px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+#sceneSvg .sway{transform-box:fill-box;transform-origin:50% 100%;animation:sway 4.5s ease-in-out infinite alternate}
+@keyframes sway{from{transform:rotate(-2.5deg)}to{transform:rotate(2.5deg)}}
+#sceneSvg .steam{animation:steam 2.8s ease-in-out infinite;opacity:0}
+@keyframes steam{0%{opacity:0;transform:translateY(6px)}40%{opacity:.85}100%{opacity:0;transform:translateY(-14px)}}
+#sceneSvg .drift{animation:drift 40s ease-in-out infinite alternate}@keyframes drift{to{transform:translateX(70px)}}
+#sceneSvg .shim{animation:shim 5s ease-in-out infinite alternate}@keyframes shim{to{transform:translateX(-16px)}}
+#sceneSvg .fly{animation:fly 24s linear infinite}@keyframes fly{from{transform:translate(-80px,20px)}to{transform:translate(780px,-20px)}}
+#sceneSvg .wave{transform-box:fill-box;transform-origin:0 50%;animation:flag 2.4s ease-in-out infinite alternate}@keyframes flag{to{transform:skewY(-4deg) scaleX(.94)}}
+/* ===== LOGIN CARD ===== */
+.login{position:relative;background:#fff;border-radius:26px;padding:48px 52px 34px;box-shadow:0 40px 80px -30px rgba(22,40,74,.35),0 0 0 1px rgba(22,40,74,.04);max-width:560px;width:100%;justify-self:end}
+.welcome{font-family:var(--disp);font-size:28px;font-weight:500;color:var(--navy)}
+.lname{font-family:var(--disp);font-weight:800;font-size:56px;color:var(--green);letter-spacing:-.04em;line-height:1.02;margin-top:2px}
+.lname span{font-weight:500}
+.sys{font-family:var(--disp);font-weight:700;font-size:24px;color:var(--navy);margin-top:4px}
+.rule{width:78px;height:4px;border-radius:4px;background:var(--gold);margin:16px 0 26px}
+
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:#F1F5F2;border-radius:12px;padding:4px;margin-bottom:22px}
+.tabs button{border:0;background:none;border-radius:9px;padding:10px;font-weight:600;font-size:14px;color:var(--muted);transition:.2s}
+.tabs button.on{background:#fff;color:var(--green);box-shadow:0 2px 6px rgba(0,0,0,.08)}
+
+.field{margin-bottom:18px}
+.field label{display:block;font-weight:600;font-size:16px;color:var(--ink);margin-bottom:8px}
+.ctl{display:flex;align-items:center;gap:12px;height:60px;padding:0 18px;border:1.5px solid var(--line);border-radius:12px;background:#fff;transition:border-color .2s,box-shadow .2s}
+.ctl:focus-within{border-color:var(--green);box-shadow:0 0 0 4px rgba(23,105,58,.12)}
+.ctl.err{border-color:var(--red);box-shadow:0 0 0 4px rgba(197,59,59,.1)}
+.ctl.ok{border-color:#3BA266}
+.ctl svg{width:22px;height:22px;flex:none;color:#6B7686}
+.ctl input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:16.5px;color:var(--ink);background:none}
+.ctl input::placeholder{color:#9AA3B0}
+.eye{border:0;background:none;color:#6B7686;display:grid;place-items:center;width:36px;height:36px;border-radius:8px}
+.eye:hover{background:#F1F5F2}
+.msg{font-size:13px;margin-top:6px;min-height:18px;color:var(--red)}
+.caps{display:none;font-size:13px;color:#9A6B00;background:var(--gold-soft);border-radius:8px;padding:6px 10px;margin-top:8px}
+.caps.on{display:block}
+.row{display:flex;justify-content:space-between;align-items:center;margin:2px 0 22px;font-size:15px}
+.row label{display:flex;gap:8px;align-items:center;cursor:pointer;color:var(--body)}
+.row input{accent-color:var(--green);width:17px;height:17px}
+.row a{color:var(--green);font-weight:600;text-decoration:none}
+.row a:hover{text-decoration:underline}
+.signin{width:100%;height:62px;border:0;border-radius:12px;background:var(--green);color:#fff;font-family:var(--disp);font-weight:700;font-size:20px;display:flex;align-items:center;justify-content:center;gap:12px;transition:.2s;box-shadow:0 14px 28px -14px rgba(23,105,58,.8)}
+.signin:hover{background:var(--green-2);transform:translateY(-1px)}
+.signin svg{width:22px;height:22px;transition:transform .2s}
+.signin:hover svg{transform:translateX(4px)}
+.signin.loading{pointer-events:none;opacity:.85}
+.spin{width:20px;height:20px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:sp .8s linear infinite;display:none}
+.signin.loading .spin{display:block}.signin.loading .lbl,.signin.loading svg{display:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+.alt{display:flex;align-items:center;gap:12px;margin:18px 0 0;font-size:13.5px;color:var(--muted)}
+.alt::before,.alt::after{content:"";flex:1;height:1px;background:var(--line)}
+.otp{width:100%;height:52px;margin-top:14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;font-weight:600;color:var(--navy);display:flex;align-items:center;justify-content:center;gap:10px}
+.otp:hover{border-color:var(--green);color:var(--green)}
+.trust{display:flex;align-items:center;gap:14px;margin-top:26px;color:var(--muted);font-size:15.5px}
+.trust::before,.trust::after{content:"";flex:1;height:1px;background:var(--line)}
+.trust span+span::before{content:"|";margin-right:14px;color:#C3CBD5}
+.notice{margin-top:16px;padding:12px 14px;border-radius:12px;background:var(--mint);font-size:13.5px;color:var(--green);display:none}
+.notice.on{display:block;animation:fd .3s}
+@keyframes fd{from{opacity:0;transform:translateY(4px)}}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px;font-size:12.5px;color:var(--muted)}
+.foot a{color:var(--muted)}
+.lang{display:flex;gap:4px;position:absolute;right:22px;top:20px}
+.lang button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 9px;font-size:12px;font-weight:600;color:var(--muted)}
+.lang button.on{border-color:var(--green);color:var(--green);background:var(--mint)}
+
+.rv{opacity:0;transform:translateY(16px);animation:in .8s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes in{to{opacity:1;transform:none}}
+.d1{animation-delay:.05s}.d2{animation-delay:.15s}.d3{animation-delay:.25s}.d4{animation-delay:.35s}.d5{animation-delay:.45s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+
+/* responsive */
+@media (max-width:1180px){
+  .grid{grid-template-columns:1fr;gap:36px;padding:32px 28px 140px}
+  .login{justify-self:center;order:2}
+  .hero{order:1}
+  .blob{width:100%;height:60%;top:auto;bottom:0;border-radius:50% 50% 0 0/20% 20% 0 0}
+  .scene{margin:18px auto 0}
+  h1,.feats{margin-left:0}.lede{margin-left:0}
+}
+@media (max-width:620px){
+  .ribbon{font-size:11px}
+  .grid{padding:24px 16px 120px}
+  .grid{gap:22px}.scene{display:none}.hero .feats,.hero .lede{display:none}.hero h1{font-size:40px;margin-top:18px}
+  .brand .mark{width:56px;height:56px;border-radius:14px}.brand .mark svg{width:30px;height:30px}
+  .brand .nm{font-size:30px}.brand .org{font-size:10.5px;letter-spacing:.16em}
+  h1{font-size:54px;margin-top:28px}
+  .lede{font-size:16.5px;margin-top:16px}
+  .feats{grid-template-columns:repeat(2,1fr);row-gap:18px}.ft:nth-child(3){border-left:0}
+  .ft i{width:54px;height:54px}.ft{font-size:13.5px}
+  .login{padding:36px 22px 26px;border-radius:22px}
+  .lname{font-size:42px}.sys{font-size:19px}.welcome{font-size:22px}
+  .ctl{height:56px}
+  .row{font-size:14px}
+  .leaves{width:200px;opacity:.35}
+  .lang{top:14px;right:14px}
+  .trust{font-size:13.5px;gap:10px}.trust span+span::before{margin-right:10px}
+}
+</style>
+</head>
+<body>
+
+<div class="ribbon" role="note"><b>DESIGN WIREFRAME</b> · Non-functional prototype — no credentials are collected or transmitted. Replace the dashed [placeholders] with the client's approved branding.</div>
+
+<div class="page">
+  <div class="blob" aria-hidden="true"></div>
+  <svg class="leaves" viewBox="0 0 300 400" aria-hidden="true"><g fill="#9FCFAA">
+    <path d="M200 20c40 30 50 80 20 120-30-30-40-80-20-120z"/><path d="M250 120c30 30 30 80 0 110-25-30-25-80 0-110z"/>
+    <path d="M150 140c35 20 50 60 30 100-30-20-45-60-30-100z"/><path d="M230 250c30 25 35 70 10 100-25-25-30-70-10-100z"/>
+    <path d="M120 40c30 25 35 65 15 95-25-25-30-65-15-95z"/></g>
+    <path d="M210 0 C215 120 240 240 260 400" stroke="#8CC39A" stroke-width="3" fill="none"/></svg>
+
+  <main class="grid">
+    <!-- ===== LEFT: brand story ===== -->
+    <section class="hero" aria-label="About the system">
+      <div class="brand rv d1">
+        <div class="mark placeholder" title="Replace with approved organisation logo"><svg viewBox="0 0 40 40" fill="none" stroke="#17693A" stroke-width="2.6" stroke-linecap="round"><path d="M5 15 20 6l15 9"/><path d="M8 16h24M10 19v11M16 19v11M24 19v11M30 19v11M6 33h28"/></svg></div>
+        <div><div class="nm placeholder">[Product]<span>Name</span></div><div class="org placeholder">[Organisation name]</div></div>
+      </div>
+
+      <h1 class="rv d2">Payroll<span class="sub">Made <em>simple.</em></span></h1>
+      <p class="lede rv d3">A comprehensive payroll management solution for a more efficient, transparent and compliant workforce management.</p>
+
+      <div class="feats rv d4" role="list">
+        <div class="ft" role="listitem"><i style="background:#D8F0E0"><svg viewBox="0 0 24 24" fill="#17693A"><circle cx="12" cy="7" r="3.2"/><circle cx="5.5" cy="9" r="2.4"/><circle cx="18.5" cy="9" r="2.4"/><path d="M6 20c0-3.5 2.7-6 6-6s6 2.5 6 6zM1 19c0-2.6 1.8-4.6 4.4-4.6 1 0 1.8.3 2.5.8C6.8 16.3 6 17.7 6 19.6zM23 19c0-2.6-1.8-4.6-4.4-4.6-1 0-1.8.3-2.5.8 1.1 1.1 1.9 2.5 1.9 4.4z"/></svg></i>Employee<br>Management</div>
+        <div class="ft" role="listitem"><i style="background:#FBEBC4"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#E3A92A"/><path d="M8.5 8h7M8.5 10.5h7M10 8c3 0 3.5 4.5 0 4.5H8.8l4.8 4.5" stroke="#5A3D00" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></i>Payroll<br>Processing</div>
+        <div class="ft" role="listitem"><i style="background:#DCE9FB"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z" fill="#2F6FD6"/><path d="M14 3v4h4" fill="#9DBEF2"/><path d="M9 12h6M9 15h6M9 18h4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></i>Leave<br>Management</div>
+        <div class="ft" role="listitem"><i style="background:#FBE0E0"><svg viewBox="0 0 24 24" fill="#D94545"><rect x="4" y="13" width="4" height="7" rx="1"/><rect x="10" y="9" width="4" height="11" rx="1"/><rect x="16" y="5" width="4" height="15" rx="1"/></svg></i>Reports &amp;<br>Analytics</div>
+      </div>
+
+      <!-- illustrated scene: office + fields + people + wooden desk, laptop on top -->
+      <div class="scene rv d5" id="scene" aria-hidden="true">
+        <svg id="sceneSvg" viewBox="0 0 700 430" preserveAspectRatio="xMidYMax meet"></svg>
+      <div class="laptop" id="laptop" aria-hidden="true">
+        <div class="screen"><div class="app">
+          <div class="top">🏛 <b>[Product]</b> Payroll Management System<span style="margin-left:auto;color:var(--muted);font-weight:500">Admin ▾</span></div>
+          <div class="side"><span class="on">▣ Dashboard</span><span>👤 Employee</span><span>₹ Payroll</span><span>🗓 Leave Management</span><span>📄 Reports</span><span>⚙ Masters</span><span>🛡 Administration</span></div>
+          <div class="main">
+            <div class="kpis">
+              <div class="kpi"><i style="background:#2F6FD6"></i><div><small>Total Employees</small><b>1,248</b></div></div>
+              <div class="kpi"><i style="background:#17693A"></i><div><small>Payroll Processed</small><b>₹ 12.45 Cr</b></div></div>
+              <div class="kpi"><i style="background:#E3A92A"></i><div><small>Leaves Today</small><b>26</b></div></div>
+              <div class="kpi"><i style="background:#D94545"></i><div><small>Pending Requests</small><b>12</b></div></div>
+            </div>
+            <div class="charts">
+              <div class="card"><h6>Monthly Payroll Trend</h6><div class="bars">
+                <div><i style="height:40%"></i><i style="height:52%;animation-delay:.1s"></i></div>
+                <div><i style="height:55%;animation-delay:.15s"></i><i style="height:62%;animation-delay:.2s"></i></div>
+                <div><i style="height:48%;animation-delay:.25s"></i><i style="height:70%;animation-delay:.3s"></i></div>
+                <div><i style="height:66%;animation-delay:.35s"></i><i style="height:74%;animation-delay:.4s"></i></div>
+                <div><i style="height:80%;animation-delay:.45s"></i><i style="height:88%;animation-delay:.5s"></i></div>
+              </div></div>
+              <div class="card"><h6>Leave Distribution</h6><div class="donut">
+                <svg viewBox="0 0 42 42"><circle cx="21" cy="21" r="15.9" fill="none" stroke="#E6EBF1" stroke-width="7"/>
+                  <circle cx="21" cy="21" r="15.9" fill="none" stroke="#17693A" stroke-width="7" stroke-dasharray="40 60" stroke-dashoffset="25"/>
+                  <circle cx="21" cy="21" r="15.9" fill="none" stroke="#E3A92A" stroke-width="7" stroke-dasharray="22 78" stroke-dashoffset="-15"/>
+                  <circle cx="21" cy="21" r="15.9" fill="none" stroke="#16284A" stroke-width="7" stroke-dasharray="20 80" stroke-dashoffset="-37"/>
+                  <circle cx="21" cy="21" r="15.9" fill="none" stroke="#2F6FD6" stroke-width="7" stroke-dasharray="10 90" stroke-dashoffset="-57"/></svg>
+                <div class="legend"><span style="--c:#17693A">Earned</span><span style="--c:#E3A92A">Casual</span><span style="--c:#16284A">Medical</span><span style="--c:#2F6FD6">Maternity</span><span style="--c:#C9D1DB">Others</span></div></div></div>
+            </div>
+          </div>
+        </div></div>
+        <div class="base"></div>
+      </div>
+        <span class="illus">Illustration</span>
+      </div>
+    </section>
+
+    <!-- ===== RIGHT: login card ===== -->
+    <section class="login rv d3" aria-labelledby="ttl">
+      <div class="lang" role="group" aria-label="Language"><button class="on" aria-pressed="true">EN</button><button aria-pressed="false">हिं</button></div>
+      <div class="welcome">Welcome to</div>
+      <div class="lname placeholder" id="ttl">[Product]<span>Name</span></div>
+      <div class="sys">Payroll Management System</div>
+      <div class="rule"></div>
+
+      <div class="tabs" role="tablist" aria-label="Sign-in method">
+        <button class="on" role="tab" aria-selected="true" data-m="email">Email</button>
+        <button role="tab" aria-selected="false" data-m="emp">Employee ID</button>
+      </div>
+
+      <form id="form" novalidate autocomplete="off">
+        <div class="field">
+          <label for="user" id="userLbl">Email Address</label>
+          <div class="ctl" id="userCtl">
+            <svg id="userIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6 8.5 7 8.5-7"/></svg>
+            <input id="user" type="email" placeholder="Enter your email address" aria-describedby="userMsg">
+          </div>
+          <div class="msg" id="userMsg" aria-live="polite"></div>
+        </div>
+        <div class="field">
+          <label for="pw">Password</label>
+          <div class="ctl" id="pwCtl">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="10" width="15" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.3" fill="currentColor"/></svg>
+            <input id="pw" type="password" placeholder="Enter your password" aria-describedby="pwMsg">
+            <button type="button" class="eye" id="eye" aria-label="Show password" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+          <div class="caps" id="caps">⚠ Caps Lock is on</div>
+          <div class="msg" id="pwMsg" aria-live="polite"></div>
+        </div>
+        <div class="row"><label><input type="checkbox"> Remember this device</label><a href="#" id="forgot">Forgot password?</a></div>
+        <button class="signin" id="signin" type="submit"><span class="lbl">Sign in</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg><span class="spin" aria-hidden="true"></span></button>
+        <div class="alt">or</div>
+        <button class="otp" type="button" id="otpBtn">📱 Sign in with OTP on registered mobile</button>
+        <div class="notice" id="notice" role="status"></div>
+      </form>
+
+      <div class="trust"><span>Secure</span><span>Reliable</span><span>Compliant</span></div>
+      <div class="foot"><span>Need help? Contact your HR / IT helpdesk</span><a href="#">Privacy policy</a></div>
+    </section>
+  </main>
+
+  <div class="waves" aria-hidden="true"><svg viewBox="0 0 1440 150" preserveAspectRatio="none">
+    <path d="M0 70 C300 140 520 20 820 70 S1260 120 1440 40 V150 H0z" fill="#C9E6D2" opacity=".7"/>
+    <path d="M0 105 C260 60 520 150 860 100 S1260 50 1440 80 V150 H0z" fill="#D6A531"/>
+    <path d="M0 118 C280 80 560 160 880 115 S1280 75 1440 100 V150 H0z" fill="#16284A"/>
+    <path d="M0 125 C200 100 380 150 560 140 V150 H0z" fill="#17693A"/></svg></div>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const user=$('#user'),pw=$('#pw'),uc=$('#userCtl'),pc=$('#pwCtl'),um=$('#userMsg'),pm=$('#pwMsg'),notice=$('#notice');
+let mode='email';
+// sign-in method tabs
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  mode=b.dataset.m;document.querySelectorAll('.tabs button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-selected',x===b)});
+  $('#userLbl').textContent=mode==='email'?'Email Address':'Employee ID';
+  user.type=mode==='email'?'email':'text';user.placeholder=mode==='email'?'Enter your email address':'Enter your employee ID';
+  $('#userIco').innerHTML=mode==='email'?'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6 8.5 7 8.5-7"/>':'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M5.5 17c.6-2 2-3 3.5-3s2.9 1 3.5 3M14.5 10h4M14.5 13.5h3"/>';
+  user.value='';uc.className='ctl';um.textContent='';user.focus()});
+// show / hide password
+$('#eye').onclick=()=>{const s=pw.type==='password';pw.type=s?'text':'password';$('#eye').setAttribute('aria-pressed',s);$('#eye').setAttribute('aria-label',s?'Hide password':'Show password')};
+// caps lock hint
+pw.addEventListener('keyup',e=>$('#caps').classList.toggle('on',e.getModifierState&&e.getModifierState('CapsLock')));
+// inline validation
+const vUser=()=>{const v=user.value.trim();let m='';if(!v)m=mode==='email'?'Please enter your email address.':'Please enter your employee ID.';
+  else if(mode==='email'&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))m='Enter a valid email address (e.g. name@organisation.in).';
+  um.textContent=m;uc.className='ctl '+(m?'err':'ok');return!m};
+const vPw=()=>{const m=pw.value?'':'Please enter your password.';pm.textContent=m;pc.className='ctl '+(m?'err':'');return!m};
+user.addEventListener('blur',()=>user.value&&vUser());user.addEventListener('input',()=>uc.classList.contains('err')&&vUser());
+pw.addEventListener('input',()=>pc.classList.contains('err')&&vPw());
+// prototype submit — nothing is sent anywhere
+$('#form').addEventListener('submit',e=>{e.preventDefault();const ok=vUser()&vPw();if(!ok)return;
+  const b=$('#signin');b.classList.add('loading');notice.classList.remove('on');
+  setTimeout(()=>{b.classList.remove('loading');pw.value='';notice.textContent='Prototype only: sign-in state shown. In the live build this hands off to the organisation\'s authentication service (SSO / MFA). No data was sent.';notice.classList.add('on')},1100)});
+$('#forgot').onclick=e=>{e.preventDefault();notice.textContent='Prototype: opens the "Reset password" flow (verify employee ID → OTP to registered mobile → set new password).';notice.classList.add('on')};
+$('#otpBtn').onclick=()=>{notice.textContent='Prototype: switches to OTP sign-in (enter employee ID → 6-digit OTP → verify).';notice.classList.add('on')};
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.lang button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-pressed',x===b)})});
+})();
+/* ===== Illustrated scene v2 (pure SVG, generated): depth, lighting, godown, people, animation ===== */
+(function(){
+const svg=document.getElementById('sceneSvg');if(!svg)return;
+let o='';
+o+=`<defs>
+<radialGradient id="sun" cx="430" cy="120" r="170" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFF4D2"/><stop offset=".35" stop-color="#FDF0CF" stop-opacity=".7"/><stop offset="1" stop-color="#EAF6EE" stop-opacity="0"/></radialGradient>
+<linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EAF6F1" stop-opacity="0"/><stop offset="1" stop-color="#DCEFE2"/></linearGradient>
+<linearGradient id="hillFar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D3EADA"/><stop offset="1" stop-color="#C4E2CC"/></linearGradient>
+<linearGradient id="hillMid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B7DCA0"/><stop offset="1" stop-color="#9FCF85"/></linearGradient>
+<linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#D6E9F5"/><stop offset=".6" stop-color="#9DC2DD"/><stop offset="1" stop-color="#7FA9C9"/></linearGradient>
+<linearGradient id="wall" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F3F6F8"/><stop offset="1" stop-color="#DCE3EA"/></linearGradient>
+<linearGradient id="roof" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A8B4BF"/><stop offset="1" stop-color="#7E8C99"/></linearGradient>
+<linearGradient id="field" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9D48A"/><stop offset="1" stop-color="#6FB05A"/></linearGradient>
+<linearGradient id="water" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#E4F6FA" stop-opacity="0"/><stop offset=".5" stop-color="#E4F6FA" stop-opacity=".95"/><stop offset="1" stop-color="#E4F6FA" stop-opacity="0"/></linearGradient>
+<linearGradient id="woodTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D49A62"/><stop offset=".6" stop-color="#B77A46"/><stop offset="1" stop-color="#A46A3A"/></linearGradient>
+<linearGradient id="woodEdge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8E5830"/><stop offset="1" stop-color="#5E3519"/></linearGradient>
+<linearGradient id="sack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F1E6C8"/><stop offset="1" stop-color="#D8C79E"/></linearGradient>
+<linearGradient id="pot" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E1DCCF"/></linearGradient>
+<radialGradient id="vign" cx="50%" cy="45%" r="70%"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#16284A" stop-opacity=".12"/></radialGradient>
+<pattern id="check" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#2E8B57"/><path d="M0 3h6M3 0v6" stroke="#E8F5EC" stroke-width="1"/></pattern>
+<pattern id="corr" width="6" height="10" patternUnits="userSpaceOnUse"><rect width="6" height="10" fill="url(#roof)"/><rect width="2" height="10" fill="#fff" opacity=".18"/></pattern>
+</defs>`;
+/* sky + sun light */
+o+=`<circle cx="430" cy="120" r="170" fill="url(#sun)"/>`;
+/* clouds (drift) */
+const cloud=(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})" opacity=".9"><ellipse cx="0" cy="0" rx="26" ry="10" fill="#fff"/><ellipse cx="-14" cy="-6" rx="14" ry="10" fill="#fff"/><ellipse cx="10" cy="-9" rx="16" ry="12" fill="#fff"/></g>`;
+o+=`<g class="drift">${cloud(90,40,1)}${cloud(330,24,.8)}</g><g class="drift" style="animation-duration:55s">${cloud(250,62,.6)}</g>`;
+/* birds */
+o+=`<g class="fly">${[[0,0],[16,6],[30,-2]].map(([x,y])=>`<path d="M${x} ${y+40} q5 -5 10 0 q5 -5 10 0" stroke="#5B6B7A" stroke-width="1.4" fill="none"/>`).join('')}</g>`;
+/* far + mid hills (atmospheric perspective) */
+o+=`<path d="M-20 205 C80 175 170 190 260 182 S440 168 520 182 S650 190 720 176 V300 H-20z" fill="url(#hillFar)"/>`;
+o+=`<path d="M-20 228 C120 205 230 222 330 214 S520 205 600 218 S690 222 720 214 V300 H-20z" fill="url(#hillMid)" opacity=".8"/>`;
+/* distant tree line */
+for(let x=-10;x<720;x+=18){const r=6+((x*7)%5);o+=`<circle cx="${x}" cy="${222-((x*13)%9)}" r="${r}" fill="${(x/18)%2?'#8DC27A':'#7BB76A'}" opacity=".8"/>`}
+
+/* FCI-style godown (warehouse) — centre */
+o+=`<g><rect x="168" y="150" width="270" height="120" fill="url(#wall)"/>
+<path d="M156 152 L303 104 L450 152 Z" fill="url(#corr)"/><path d="M156 152 L303 104 L450 152" stroke="#6B7987" stroke-width="2" fill="none"/>
+<rect x="160" y="150" width="286" height="6" fill="#6B7987" opacity=".6"/>
+${[200,240,280,320,360,400].map(x=>`<rect x="${x}" y="164" width="18" height="8" rx="1" fill="#9AA8B6"/><path d="M${x+2} 166h14M${x+2} 169h14" stroke="#7E8C99" stroke-width=".8"/>`).join('')}
+<rect x="248" y="124" width="110" height="16" rx="3" fill="#D6A531"/><text x="303" y="135.5" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" font-weight="700" fill="#3A2A00" letter-spacing="1">[STORAGE DEPOT]</text>
+${[190,262,334,406].map(x=>`<rect x="${x-18}" y="200" width="44" height="70" fill="#8796A4"/>${Array.from({length:9},(_,i)=>`<path d="M${x-18} ${204+i*7.5}h44" stroke="#6F7D8B" stroke-width="1"/>`).join('')}`).join('')}
+</g>`;
+/* stacked grain sacks pyramid beside the godown */
+const sack=(x,y,w=34,h=20)=>`<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="9" fill="url(#sack)" stroke="#C7B488" stroke-width="1"/><path d="M${x+5} ${y+4} q${w/2-5} 3 ${w-10} 0" stroke="#BFAA78" stroke-width="1" stroke-dasharray="2 2" fill="none"/><rect x="${x+w/2-6}" y="${y+7}" width="12" height="6" rx="1" fill="#17693A" opacity=".55"/></g>`;
+for(let r=0;r<6;r++){const n=6-r;for(let i=0;i<n;i++)o+=sack(440+r*17+i*32,252-r*18)}
+
+/* corporate HQ — right, with reflections */
+o+=`<g><rect x="498" y="44" width="160" height="226" rx="3" fill="#E9EFF4"/><rect x="498" y="44" width="160" height="12" fill="#CBD6E0"/>`;
+for(let r=0;r<10;r++)for(let k=0;k<6;k++)o+=`<rect x="${506+k*25}" y="${64+r*19.5}" width="21" height="16" rx="1.5" fill="url(#glass)" opacity="${.78+((r+k)%3)*.07}"/>`;
+o+=`<path d="M520 64 L570 64 L520 150Z M590 64 L615 64 L560 160 L548 160Z" fill="#fff" opacity=".22"/>`;
+o+=`<rect x="520" y="50" width="116" height="13" rx="3" fill="#17693A"/><text x="578" y="59.6" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.6" font-weight="700" fill="#fff" letter-spacing=".9">[ORGANISATION]</text>`;
+o+=`<rect x="652" y="118" width="46" height="152" rx="2" fill="#DDE5EC"/>`;for(let r=0;r<7;r++)for(let k=0;k<2;k++)o+=`<rect x="${656+k*20}" y="${126+r*20}" width="16" height="15" rx="1" fill="url(#glass)" opacity=".8"/>`;
+o+=`<path d="M556 236 h44 l6 -8 h-56z" fill="#16284A"/><rect x="560" y="236" width="36" height="34" fill="#2B4A75" opacity=".9"/><rect x="540" y="268" width="76" height="4" fill="#B9C4CF"/></g>`;
+o+=`<line x1="472" y1="270" x2="472" y2="104" stroke="#9AA7B4" stroke-width="2"/><g class="wave"><path d="M472 106 q12 -3 24 0 v16 q-12 -3 -24 0z" fill="#D6A531"/><path d="M472 111.3 q12 -3 24 0 v5.4 q-12 -3 -24 0z" fill="#fff"/><path d="M472 116.6 q12 -3 24 0 v5.4 q-12 -3 -24 0z" fill="#17693A"/></g>`;
+[[452,270,15],[484,272,11],[690,270,13]].forEach(([x,y,r])=>o+=`<circle cx="${x}" cy="${y-r}" r="${r}" fill="#5FA54F"/><circle cx="${x+r*.45}" cy="${y-r*1.35}" r="${r*.7}" fill="#7DC06A"/><circle cx="${x-r*.3}" cy="${y-r*1.2}" r="${r*.5}" fill="#9AD188" opacity=".8"/><rect x="${x-1.5}" y="${y-4}" width="3" height="8" fill="#7A5230"/>`);
+
+/* rice paddy (terraced, water shimmer) */
+o+=`<path d="M-20 262 C150 252 300 258 460 255 S650 256 720 258 V330 H-20z" fill="url(#field)"/>`;
+for(let r=0;r<7;r++){const y=266+r*9.5;o+=`<g class="shim" style="animation-delay:${-r}s"><rect x="-20" y="${y+3}" width="760" height="2.2" fill="url(#water)" opacity=".75"/></g>`;
+  for(let x=-6+(r%2)*6;x<710;x+=13-r){const h=5+r*1.4;o+=`<path d="M${x} ${y+5} l-${2+r*.35} -${h} M${x} ${y+5} l0 -${h+1} M${x} ${y+5} l${2+r*.35} -${h}" stroke="${r%2?'#4E9A3E':'#3D8731'}" stroke-width="${1+r*.13}" stroke-linecap="round"/>`}}
+
+/* wheat helpers */
+const ear=(px,py,deg,c)=>{let t='';for(let i=0;i<7;i++){const k=i*5.5,ex=px+Math.sin(deg/57.3)*k,ey=py-Math.cos(deg/57.3)*k;
+  t+=`<ellipse cx="${ex-2.5}" cy="${ey}" rx="2.3" ry="4.4" fill="${c}" transform="rotate(${deg-26} ${ex-2.5} ${ey})"/><ellipse cx="${ex+2.5}" cy="${ey}" rx="2.3" ry="4.4" fill="${c}" transform="rotate(${deg+26} ${ex+2.5} ${ey})"/><path d="M${ex-3} ${ey-3} l${-5+deg/10} -9 M${ex+3} ${ey-3} l${5+deg/10} -9" stroke="${c}" stroke-width=".7" opacity=".85"/>`}
+  return t};
+const wheat=(x,yb,h,a,c,delay)=>{const tx=x+Math.sin(a)*h*.62,ty=yb-Math.cos(a)*h*.62;return `<g class="sway" style="animation-delay:${delay}s"><path d="M${x} ${yb} Q${x+Math.sin(a)*h*.3} ${yb-h*.4} ${tx} ${ty}" stroke="${c}" stroke-width="1.7" fill="none"/><path d="M${x} ${yb-h*.25} q-10 -8 -14 -22" stroke="#9DB64A" stroke-width="1.6" fill="none"/>${ear(tx,ty,a*57.3,c)}</g>`};
+/* wheat field — left, tall, swaying */
+[[2,312,170,-.16],[14,316,186,-.04],[26,312,176,.08],[40,314,160,.18],[60,316,190,.02],[76,312,168,.14],[96,316,150,-.08],[118,312,158,.06],[134,316,140,.16],[150,312,130,-.04]].forEach(([x,y,h,a],i)=>o+=wheat(x,y,h,a,i%2?'#DDAE3C':'#C99227',-(i*0.37)));
+/* rice plants with panicles beside laptop */
+const rice=(x,yb)=>{let t=`<g class="sway" style="animation-delay:-1.2s">`;for(let i=-3;i<=3;i++)t+=`<path d="M${x} ${yb} Q${x+i*6} ${yb-40} ${x+i*14} ${yb-70+Math.abs(i)*8}" stroke="${i%2?'#4E9A3E':'#5FAE4A'}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+  t+=`<path d="M${x} ${yb} Q${x+4} ${yb-84} ${x+28} ${yb-64}" stroke="#7FA83A" stroke-width="1.6" fill="none"/>`;for(let i=0;i<9;i++){const u=i/9;t+=`<ellipse cx="${x+10+u*18}" cy="${yb-80+u*18}" rx="1.9" ry="3.1" fill="#D8C35A" transform="rotate(${30+u*40} ${x+10+u*18} ${yb-80+u*18})"/>`}return t+'</g>'};
+o+=rice(158,324)+rice(548,324);
+
+/* ===== people (detailed, smiling) — drawn at origin: shoulder line y=0 ===== */
+const face=(sk,opt={})=>`<rect x="-7" y="-18" width="14" height="17" rx="5" fill="${sk}"/><path d="M-7 -6 q7 5 14 0" fill="#000" opacity=".12"/>
+<circle cx="-21" cy="-35" r="4.2" fill="${sk}"/><circle cx="21" cy="-35" r="4.2" fill="${sk}"/><circle cx="0" cy="-36" r="21" fill="${sk}"/>
+<path d="M9 -55 A21 21 0 0 1 9 -17 A24 24 0 0 0 9 -55Z" fill="#000" opacity=".07"/>
+<path d="M-13 -46 q5 -3 9 -1 M4 -47 q5 -2 9 1" stroke="#3A2A1E" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+<path d="M-11 -39.5 q4 -4 8 0 M3 -39.5 q4 -4 8 0" stroke="#2A1E14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+<path d="M-1 -36 q-2 5 1 6" stroke="#000" stroke-width="1" opacity=".18" fill="none"/>
+<circle cx="-12" cy="-30" r="3.8" fill="#F08A7E" opacity=".35"/><circle cx="12" cy="-30" r="3.8" fill="#F08A7E" opacity=".35"/>
+<path d="M-9.5 -28 Q0 -15.5 9.5 -28 Z" fill="#8E3B2F"/><path d="M-7.5 -27.6 Q0 -24 7.5 -27.6 Z" fill="#fff"/><path d="M-4 -20 q4 2 8 0" stroke="#E57F6F" stroke-width="1.6" fill="none" opacity=".6"/>`;
+const torso=(c,shade=.13)=>`<path d="M-40 92 L-40 22 Q-40 0 -18 -4 L18 -4 Q40 0 40 22 L40 92Z" fill="${c}"/><path d="M14 -4 Q40 0 40 22 L40 92 L24 92 Q30 40 14 -4Z" fill="#000" opacity="${shade}"/><path d="M-35 22 Q-33 6 -20 1" stroke="#fff" stroke-width="2.2" opacity=".28" fill="none" stroke-linecap="round"/>`;
+const armUp=(sleeve,sk,side=1)=>`<path d="M${30*side} 8 Q${54*side} -6 ${48*side} -34" stroke="${sleeve}" stroke-width="14" fill="none" stroke-linecap="round"/><circle cx="${48*side}" cy="-42" r="8" fill="${sk}"/><path d="M${44*side} -50 v-6 M${48*side} -51 v-7 M${52*side} -50 v-6" stroke="${sk}" stroke-width="3.6" stroke-linecap="round"/>`;
+const armFront=(sleeve,sk,side=-1)=>`<path d="M${32*side} 10 Q${40*side} 42 ${8*side} 50" stroke="${sleeve}" stroke-width="13" fill="none" stroke-linecap="round"/><circle cx="${6*side}" cy="50" r="7" fill="${sk}"/>`;
+const SK=['#EBB993','#C98A5F','#B57650','#DCA67C','#E3AF88','#BF8059'];
+const PPL={
+ farmerMan:sk=>torso('#F6F2E8')+`<path d="M-30 2 L-8 92 L6 92 L-14 -2Z" fill="url(#check)"/>`+armUp('#F6F2E8',sk,1)+`<g class="sway" style="animation-delay:-.6s">${ear(48,-58,8,'#D9A93A')}${ear(42,-56,-12,'#C99227')}</g>`+face(sk)+
+   `<path d="M-23 -44 Q-25 -70 0 -70 Q25 -70 23 -44 Q0 -53 -23 -44Z" fill="#F08C2E"/><path d="M-22 -50 Q0 -61 22 -50" stroke="#D66F14" stroke-width="2.4" fill="none"/><path d="M-21 -57 Q0 -67 21 -57" stroke="#D66F14" stroke-width="2" fill="none"/><path d="M18 -60 q12 2 14 18" stroke="#F08C2E" stroke-width="6" fill="none" stroke-linecap="round"/>`+
+   `<path d="M-11 -31.5 q5.5 3.5 11 0 q5.5 3.5 11 0" stroke="#3A2A1E" stroke-width="3.2" fill="none" stroke-linecap="round"/>`,
+ farmerWoman:sk=>`<path d="M-30 -40 Q-30 -72 0 -72 Q30 -72 30 -40 L40 30 L-40 30Z" fill="#2E8B57"/>`+torso('#2E8B57')+`<path d="M-40 30 L30 -2 L40 8 L-34 44Z" fill="#D6A531" opacity=".9"/>`+
+   `<g transform="rotate(-28 0 40)">${Array.from({length:9},(_,i)=>`<path d="M${-30+i*2} 70 L${18+i*2} 10" stroke="#C99227" stroke-width="1.5"/>`).join('')}<g class="sway">${ear(22,6,10,'#D9A93A')}${ear(28,10,30,'#DDAE3C')}${ear(16,8,-8,'#C99227')}</g></g>`+armFront('#2E8B57',sk,-1)+
+   face(sk)+`<path d="M-21 -46 Q0 -62 21 -46 Q12 -54 0 -54 Q-12 -54 -21 -46Z" fill="#2B1D16"/><path d="M-26 -44 Q0 -70 26 -44" stroke="#2E8B57" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M-26 -44 Q0 -70 26 -44" stroke="#D6A531" stroke-width="1.6" fill="none"/>`+
+   `<circle cx="0" cy="-46" r="2" fill="#C0392B"/><circle cx="-4" cy="-33" r="1.3" fill="#E5B53A"/><circle cx="-22" cy="-30" r="2.2" fill="#E5B53A"/><circle cx="22" cy="-30" r="2.2" fill="#E5B53A"/>`,
+ labourer:sk=>torso('#B39462')+`<path d="M-8 -4 L0 18 L8 -4" fill="#8F7448"/><path d="M-40 40 h80" stroke="#8F7448" stroke-width="2" opacity=".5"/>`+
+   `<g transform="rotate(-14 30 -16)"><rect x="4" y="-36" width="58" height="36" rx="14" fill="url(#sack)" stroke="#C7B488"/><path d="M10 -28 q24 4 48 0 M10 -10 q24 4 48 0" stroke="#BFAA78" stroke-width="1.2" stroke-dasharray="3 2" fill="none"/><rect x="24" y="-24" width="18" height="9" rx="1.5" fill="#17693A" opacity=".55"/></g>`+
+   armUp(sk,sk,1)+armFront(sk,sk,-1)+face(sk)+`<path d="M-21 -46 Q0 -64 21 -46 Q12 -55 0 -55 Q-12 -55 -21 -46Z" fill="#241811"/><path d="M-23 -46 h46" stroke="#C0392B" stroke-width="5" stroke-linecap="round"/><path d="M-22 -46 q-10 4 -8 14" stroke="#C0392B" stroke-width="4" fill="none" stroke-linecap="round"/>`+
+   `<path d="M-13 -24 q13 8 26 0" stroke="#3A2A1E" stroke-width="1" opacity=".35" fill="none" stroke-dasharray="1 2"/>`,
+ managerMan:sk=>torso('#1E3560',.18)+`<path d="M-12 -4 L0 30 L12 -4Z" fill="#fff"/><path d="M-3 2 L3 2 L4 28 L0 34 L-4 28Z" fill="#17693A"/><path d="M-12 -4 L-4 44 L-22 8Z M12 -4 L4 44 L22 8Z" fill="#16284A"/><rect x="-30" y="22" width="10" height="3" rx="1" fill="#fff" opacity=".8"/>`+
+   armUp('#1E3560',sk,1)+face(sk)+`<path d="M-21 -40 Q-24 -64 0 -63 Q24 -64 21 -42 Q14 -54 -2 -52 Q-14 -52 -21 -40Z" fill="#555"/><path d="M-14 -57 q8 -6 20 -3" stroke="#B5B5B5" stroke-width="1.8" fill="none"/>`+
+   `<rect x="-15" y="-44" width="12" height="9" rx="3" fill="none" stroke="#16284A" stroke-width="1.5"/><rect x="3" y="-44" width="12" height="9" rx="3" fill="none" stroke="#16284A" stroke-width="1.5"/><path d="M-3 -40h6" stroke="#16284A" stroke-width="1.5"/>`,
+ employeeWoman:sk=>`<path d="M-24 -30 Q-28 -64 0 -62 Q28 -64 24 -30 Q22 -12 12 -8 L16 -34 Q0 -46 -16 -34 L-12 -8 Q-22 -12 -24 -30Z" fill="#2B1D16"/>`+torso('#2F8F83')+`<path d="M-12 -4 L0 12 L12 -4" fill="#F3D9C4"/><path d="M-10 -2 L-2 34 M10 -2 L2 34" stroke="#16284A" stroke-width="2"/><rect x="-8" y="32" width="16" height="20" rx="2" fill="#fff"/><rect x="-5" y="35" width="10" height="6" rx="1" fill="#17693A"/>`+
+   `<g><rect x="-34" y="24" width="30" height="40" rx="4" fill="#16284A"/><rect x="-31" y="27" width="24" height="30" rx="2" fill="#9DC2DD"/><path d="M-28 33 h14 M-28 38 h18 M-28 43 h10" stroke="#fff" stroke-width="1.6"/></g>`+armFront('#2F8F83',sk,-1)+
+   face(sk)+`<path d="M-20 -40 Q-16 -60 0 -59 Q16 -60 20 -40 Q6 -52 -20 -40Z" fill="#2B1D16"/><circle cx="0" cy="-63" r="8" fill="#2B1D16"/><circle cx="0" cy="-50" r="1.6" fill="#C0392B"/>`+
+   `<circle cx="-7" cy="-39" r="6" fill="none" stroke="#16284A" stroke-width="1.4"/><circle cx="7" cy="-39" r="6" fill="none" stroke="#16284A" stroke-width="1.4"/><path d="M-1 -39h2" stroke="#16284A" stroke-width="1.4"/><circle cx="-22" cy="-28" r="2" fill="#E5B53A"/><circle cx="22" cy="-28" r="2" fill="#E5B53A"/>`,
+ employeeMan:sk=>torso('#9CC3E6')+`<path d="M-11 -4 L0 10 L11 -4" fill="#fff"/><path d="M-10 -2 L-2 30 M10 -2 L2 30" stroke="#17693A" stroke-width="2"/><rect x="-8" y="28" width="16" height="20" rx="2" fill="#fff"/><rect x="-5" y="31" width="10" height="6" rx="1" fill="#17693A"/><path d="M-26 40 v40 M26 40 v40" stroke="#7FA8CC" stroke-width="1"/>`+
+   `<path d="M30 8 Q50 0 46 -24" stroke="#9CC3E6" stroke-width="13" fill="none" stroke-linecap="round"/><circle cx="46" cy="-30" r="7.5" fill="${sk}"/><path d="M46 -36 v-9" stroke="${sk}" stroke-width="4.5" stroke-linecap="round"/>`+
+   face(sk)+`<path d="M-21 -40 Q-23 -63 0 -63 Q23 -63 21 -42 Q16 -52 6 -52 Q-6 -56 -21 -40Z" fill="#1F1712"/><path d="M-9 -58 q10 -4 18 0" stroke="#4A3A30" stroke-width="1.6" fill="none"/>`
+};
+const person=(type,x,y,s,sk)=>`<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="92" rx="46" ry="6" fill="#000" opacity=".08"/>${PPL[type](sk)}<path d="M38 22 Q40 50 40 92" stroke="#FFF4D2" stroke-width="2" opacity=".35" fill="none"/></g>`;
+/* back row */
+o+=person('farmerWoman',30,250,.84,SK[3])+person('farmerMan',116,248,.84,SK[2]);
+o+=person('employeeWoman',590,248,.84,SK[4])+person('employeeMan',672,250,.84,SK[5]);
+/* front row */
+o+=person('labourer',72,292,1,SK[1])+person('managerMan',630,292,1,SK[0]);
+/* labels */
+const label=(x,y,t,c)=>`<g><rect x="${x-t.length*3.3-12}" y="${y}" width="${t.length*6.6+22}" height="20" rx="10" fill="#fff" opacity=".95" stroke="${c}" stroke-width="1.2"/><circle cx="${x-t.length*3.3-2}" cy="${y+10}" r="3" fill="${c}"/><text x="${x+4}" y="${y+13.8}" text-anchor="middle" font-family="Inter,sans-serif" font-size="10.5" font-weight="600" fill="#1A2433">${t}</text></g>`;
+const LBL=label(72,140,'Farmers','#D6A531')+label(104,306,'Labourers','#C0392B')+label(630,140,'Employees','#2F8F83')+label(628,312,'Management','#16284A');
+
+/* ===== wooden workstation ===== */
+o+=`<path d="M-20 336 L720 336 L720 398 L-20 398Z" fill="url(#woodTop)"/>`;
+for(let i=0;i<10;i++){const y=340+i*6;o+=`<path d="M-20 ${y} C140 ${y-3} 300 ${y+3} 450 ${y} S640 ${y-2} 720 ${y+1}" stroke="#A9703F" stroke-width="${i%3?.8:1.4}" fill="none" opacity=".5"/>`}
+o+=`<ellipse cx="210" cy="360" rx="14" ry="3.5" fill="none" stroke="#9A6436" stroke-width="1" opacity=".55"/><ellipse cx="210" cy="360" rx="7" ry="1.8" fill="none" stroke="#9A6436" stroke-width="1" opacity=".55"/>`;
+o+=`<rect x="-20" y="336" width="740" height="10" fill="#fff" opacity=".08"/><rect x="-20" y="398" width="740" height="32" fill="url(#woodEdge)"/><rect x="-20" y="396" width="740" height="3" fill="#E1AE78" opacity=".75"/>`;
+o+=`<ellipse cx="350" cy="384" rx="240" ry="9" fill="#4A2810" opacity=".25"/>`;
+/* potted plant (detailed leaves) — left */
+o+=`<ellipse cx="50" cy="386" rx="32" ry="5" fill="#4A2810" opacity=".25"/><path d="M28 338 L72 338 L66 386 L34 386Z" fill="url(#pot)"/><rect x="25" y="331" width="50" height="9" rx="3" fill="#ECE7DB"/><path d="M30 352 h40" stroke="#D6A531" stroke-width="2" opacity=".7"/>`;
+o+=`<g class="sway" style="animation-duration:6s">`;[[-70,52],[-110,50],[-90,62],[-40,42],[-140,42],[-58,64],[-122,60],[-80,46],[-100,40]].forEach(([a,l],i)=>{const r=a*Math.PI/180,x=50,y=332,ex=x+Math.cos(r)*l,ey=y+Math.sin(r)*l,mx=(x+ex)/2,my=(y+ey)/2,nx=-Math.sin(r)*10,ny=Math.cos(r)*10;
+  o+=`<path d="M${x} ${y} Q${mx+nx} ${my+ny} ${ex} ${ey} Q${mx-nx} ${my-ny} ${x} ${y}Z" fill="${['#3F9B4F','#56B35E','#2F8A43'][i%3]}"/><path d="M${x} ${y} Q${mx} ${my} ${ex} ${ey}" stroke="#E6F5E2" stroke-width=".8" opacity=".6" fill="none"/>`});o+=`</g>`;
+/* glass jar with wheat bouquet — right of laptop */
+o+=`<g><ellipse cx="560" cy="388" rx="16" ry="3.5" fill="#4A2810" opacity=".2"/><path d="M548 352 h24 v32 q0 4 -4 4 h-16 q-4 0 -4 -4z" fill="#DDEFF3" opacity=".55" stroke="#C3DDE3"/><path d="M551 370 h18" stroke="#9FC7D1" stroke-width="1" opacity=".7"/>
+<g class="sway" style="animation-delay:-2s">${[-.35,-.15,0,.18,.35].map((a,i)=>{const h=58+i%2*8,tx=560+Math.sin(a)*h,ty=380-Math.cos(a)*h;return `<path d="M560 380 L${tx} ${ty}" stroke="#C99227" stroke-width="1.4"/>${ear(tx,ty,a*57.3,i%2?'#DDAE3C':'#C99227')}`}).join('')}</g></g>`;
+/* mug with animated steam */
+o+=`<g><ellipse cx="610" cy="389" rx="22" ry="4" fill="#4A2810" opacity=".22"/><rect x="592" y="350" width="34" height="38" rx="6" fill="#FBFBF8"/><rect x="592" y="350" width="10" height="38" rx="5" fill="#fff"/><rect x="618" y="352" width="8" height="34" rx="4" fill="#000" opacity=".06"/><path d="M626 358 q14 0 14 10 q0 10 -14 10" stroke="#F1F1EC" stroke-width="5" fill="none"/><ellipse cx="609" cy="351" rx="17" ry="3" fill="#6B3F20"/>
+<path d="M609 362 q-6 8 0 16 q6 -8 0 -16" fill="#17693A"/><path d="M609 364 v12" stroke="#fff" stroke-width=".8" opacity=".7"/>
+${[0,1,2].map(i=>`<path class="steam" style="animation-delay:${i*0.9}s" d="M${602+i*7} 344 q4 -6 0 -12 q-4 -6 0 -12" stroke="#C8D2CC" stroke-width="2" fill="none" stroke-linecap="round"/>`).join('')}</g>`;
+/* notebook, pen, phone */
+o+=`<path d="M470 390 L556 386 L562 398 L476 402Z" fill="#16284A"/><path d="M474 388 L554 384" stroke="#fff" stroke-width="1" opacity=".5"/><path d="M486 395 L548 383" stroke="#D6A531" stroke-width="3" stroke-linecap="round"/><path d="M548 383 l4 -1" stroke="#16284A" stroke-width="3" stroke-linecap="round"/>`;
+o+=`<rect x="650" y="378" width="38" height="18" rx="4" fill="#1E2430" transform="rotate(-6 669 387)"/><rect x="653" y="380.5" width="32" height="13" rx="2" fill="#2E3A4F" transform="rotate(-6 669 387)"/>`;
+/* wheat + rice sprigs lying on the desk */
+const lying=(x,y,l,a,c)=>{let t=`<path d="M${x} ${y} l${l} ${a}" stroke="${c}" stroke-width="1.6"/>`;for(let i=0;i<7;i++){const px=x+l*(.58+i*.06),py=y+a*(.58+i*.06);t+=`<ellipse cx="${px}" cy="${py-2.4}" rx="4.4" ry="2.2" fill="${c}" transform="rotate(-24 ${px} ${py-2.4})"/><ellipse cx="${px}" cy="${py+2.4}" rx="4.4" ry="2.2" fill="${c}" transform="rotate(24 ${px} ${py+2.4})"/><path d="M${px} ${py-3} l8 -6 M${px} ${py+3} l8 6" stroke="${c}" stroke-width=".7"/>`}return t};
+o+=`<ellipse cx="160" cy="398" rx="70" ry="3" fill="#4A2810" opacity=".18"/>`+lying(96,392,124,-6,'#D9A93A')+lying(104,396,112,2,'#C99227');
+o+=`<path d="M380 393 Q420 385 462 392" stroke="#6E9A3A" stroke-width="1.6" fill="none"/>`;for(let i=0;i<10;i++){const u=i/10;o+=`<ellipse cx="${410+u*46}" cy="${390+Math.sin(u*3.1)*3}" rx="3.2" ry="1.7" fill="#D8C35A" transform="rotate(${-10+u*30} ${410+u*46} 390)"/>`}
+o+=LBL;
+/* soft lighting: warm key light + vignette */
+
+svg.innerHTML=o;
+
+/* scale the HTML laptop to the scene */
+const sc=document.getElementById('scene'),lap=document.getElementById('laptop');
+const fit=()=>{const w=sc.clientWidth;if(w)lap.style.setProperty('--k',(w*0.54/560).toFixed(3))};
+fit();addEventListener('resize',fit);
+})();
+</script>
+</body>
+</html>

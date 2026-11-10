@@ -1,0 +1,52 @@
+# Backend per-environment settings, shared by the online and the batch instance: install as
+# ${fci.config.dir}/backend/application.yaml (0640, root:tomcat). Loaded through
+# spring.config.additional-location from the context descriptor (config/tomcat/.../api.xml).
+# NO SECRETS HERE: they are files in ${fci.config.dir}/secrets/backend/ (scripts/GenerateSecrets.java).
+
+spring:
+  config:
+    import:
+      # One file per property, named after it, mode 0400, owner tomcat (ADR-0013).
+      - optional:configtree:${fci.config.dir}/secrets/backend/
+  # The database (owner 2026-11-01): DEV, UAT and production run on the ON-PREMISES Oracle of the
+  # environment; H2 is only for tests. Profile oracle (FCI_PROFILE=<env>,oracle in the instances' env
+  # files) builds jdbc:oracle:thin:@//<host>:<port>/<service> from fci.oracle below and brings the pool,
+  # dialect and session settings (application-oracle.yml). The password is the schema owner's:
+  # secrets/backend/spring.datasource.password. No wallet: the cloud wallet is for local machines only.
+  # Start order: online (migrates with Flyway as the schema owner), batch. Backups: the DBA's RMAN.
+  mail:
+    host: smtp.fci.gov.in
+    port: 587
+    username: no-reply@fci.gov.in
+    # password: secrets/backend/spring.mail.password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
+
+fci:
+  # The on-premises Oracle of this environment (profile oracle). Set per environment.
+  oracle:
+    host: fci-db.example.internal     # the database host or RAC SCAN name
+    port: 1521
+    service: FCIPAY                   # the database service name
+    username: FCI_PAYROLL             # the schema owner (db/tools/oracle/create_app_user.sql), never a DBA
+  common:
+    # Must match the instance's management connector (online 8081, batch 8091): setenv passes it.
+    management-port: ${fci.mgmt.port}
+  logging:
+    # setenv sets the root per instance (.../online, .../batch).
+    dir: ${fci.logging.dir.root}
+    max-history-days: 180            # CERT-In: at least 180 days
+  api:
+    # OTP verification of the critical activities (gated approvals, cycle freeze / lock, step-up of
+    # sensitive screens, role switch): 'Y' in UAT and production - the application refuses to start
+    # with 'N' there (StartupGuards). 'N' is for development and local machines only: set it there
+    # by hand. This template installs on the servers, so it ships the safe value.
+    otp:
+      required: 'Y'
+    session:
+      secure-cookie: true

@@ -1,0 +1,1312 @@
+/*
+ * Sign-in page (X-08) as the login wireframe (payroll-login-wireframe_1.html; owner 2026-10-30: no
+ * deviation): its tokens, fonts (self-hosted: Plus Jakarta Sans, Inter, DM Serif Display italic;
+ * CSP font-src 'self'), sizes and breakpoints, prefixed lx-. Left out are only the wireframe's own
+ * notes (the "DESIGN WIREFRAME" ribbon and the "Illustration" caption) and its placeholder logo
+ * (no logo image). Layout follows the reference at every viewport, including scrolling where the
+ * original composition is taller than the screen. The `lg-*` rules below serve the password-reset form and the
+ * help dialogs. No inline styles (CSP).
+ */
+.lx-page {
+  --lx-green: #17693a;
+  --lx-green-2: #1f8048;
+  --lx-green-soft: #e3f2e7;
+  --lx-mint: #eef7f0;
+  --lx-navy: #16284a;
+  --lx-navy-2: #1e3560;
+  --lx-gold: #d6a531;
+  --lx-gold-soft: #fbf1d6;
+  --lx-ink: #1a2433;
+  --lx-body: #4a5568;
+  --lx-muted: #7a8596;
+  --lx-line: #d7dee6;
+  --lx-red: #c53b3b;
+  --lx-disp: var(--font-jakarta), var(--font-devanagari), system-ui, sans-serif;
+  --lx-sans: var(--font-inter), var(--font-devanagari), system-ui, sans-serif;
+  --lx-serif: var(--font-dm-serif), var(--font-devanagari), Georgia, serif;
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  color: var(--lx-body);
+  font-family: var(--lx-sans);
+  font-size: 16px;
+  line-height: normal;
+  background:
+    radial-gradient(900px 600px at 15% 20%, #fff 0%, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(120deg, #f7fbf8 0%, #eaf5ec 100%);
+  -webkit-font-smoothing: antialiased;
+}
+/* Buttons take the page's font; :where() keeps this below each button's own size and weight. */
+:where(.lx-page) button {
+  font: inherit;
+  cursor: pointer;
+}
+.lx-page :focus-visible {
+  outline: 3px solid var(--lx-gold);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+.lx-blob {
+  position: absolute;
+  top: -12%;
+  right: -8%;
+  z-index: 0;
+  width: 62%;
+  height: 120%;
+  border-radius: 48% 0 0 52% / 60% 0 0 40%;
+  background: linear-gradient(160deg, #ddefe1, #cfe7d5);
+}
+.lx-leaves {
+  position: absolute;
+  top: 20px;
+  right: -30px;
+  z-index: 0;
+  width: 340px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.lx-waves {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  height: 150px;
+  pointer-events: none;
+}
+.lx-waves svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.lx-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 48px;
+  align-items: center;
+  max-width: 1360px;
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: 40px 48px 150px;
+}
+.lx-grid > * {
+  min-width: 0;
+}
+.lx-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Left: the brand story */
+.lx-brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.lx-mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  border: 1.5px solid #cfe3d5;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 24px -14px rgba(23, 105, 58, 0.5);
+}
+.lx-mark svg {
+  width: 40px;
+  height: 40px;
+}
+.lx-nm {
+  color: var(--lx-green);
+  font-family: var(--lx-disp);
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.lx-nm span {
+  font-weight: 500;
+}
+.lx-org {
+  margin-top: 8px;
+  color: var(--lx-green);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.wf .lx-hero h1 {
+  margin: 30px 0 0 30px;
+  color: var(--lx-navy);
+  font-family: var(--lx-disp);
+  font-size: clamp(58px, 7vw, 104px);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+}
+.lx-sub {
+  display: block;
+  margin: 6px 0 0 1.6em;
+  color: var(--lx-navy);
+  font-family: var(--lx-serif);
+  font-size: 0.62em;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.lx-sub em {
+  position: relative;
+  color: var(--lx-green);
+  font-style: italic;
+}
+.lx-sub em::after {
+  content: '';
+  position: absolute;
+  right: -4%;
+  bottom: -0.08em;
+  left: 8%;
+  height: 0.16em;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14'%3E%3Cpath d='M2 10 C60 2 140 2 198 8' fill='none' stroke='%23D6A531' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E")
+    no-repeat center / 100% 100%;
+}
+.lx-lede {
+  max-width: 470px;
+  margin: 26px 0 0 104px;
+  color: #55606f;
+  font-size: 20px;
+  line-height: 1.5;
+}
+.lx-feats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  max-width: 620px;
+  margin: 26px 0 0 30px;
+}
+.lx-ft {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border-left: 1px solid #d3ded6;
+  color: var(--lx-ink);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+}
+.lx-ft:first-child {
+  border-left: 0;
+}
+.lx-ft i {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  transition: transform 0.25s;
+}
+.lx-ft:hover i {
+  transform: translateY(-4px);
+}
+.lx-ft svg {
+  width: 30px;
+  height: 30px;
+}
+.lx-ft-employees {
+  background: #d8f0e0;
+}
+.lx-ft-payroll {
+  background: #fbebc4;
+}
+.lx-ft-leave {
+  background: #dce9fb;
+}
+.lx-ft-reports {
+  background: #fbe0e0;
+}
+
+/* The illustrated scene (the wireframe's drawing, scripts/build-login-scene.mjs) and the laptop */
+.lx-scene {
+  position: relative;
+  width: min(720px, 100%);
+  margin: 30px 0 0;
+  aspect-ratio: 700 / 430;
+}
+.lx-scene-art,
+.lx-scene-words {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+}
+.lx-scene-art {
+  object-fit: contain;
+  object-position: 50% 100%;
+}
+.lx-sign {
+  font-family: var(--lx-sans);
+  font-weight: 700;
+}
+.lx-sign-depot {
+  fill: #3a2a00;
+  font-size: 8.5px;
+  letter-spacing: 1px;
+}
+.lx-sign-org {
+  fill: #fff;
+  font-size: 5.4px;
+  letter-spacing: 0.3px;
+}
+.lx-tag {
+  fill: #1a2433;
+  font-family: var(--lx-sans);
+  font-size: 10.5px;
+  font-weight: 600;
+}
+.lx-laptop {
+  position: absolute;
+  bottom: 13.5%;
+  left: 50%;
+  width: 560px;
+  perspective: 1400px;
+  transform: translateX(-50%) scale(var(--lx-k, 0.75));
+  transform-origin: 50% 100%;
+}
+.lx-screen {
+  position: relative;
+  padding: 10px;
+  border-radius: 16px 16px 4px 4px;
+  background: #1c1f26;
+  box-shadow: 0 30px 60px -24px rgba(22, 40, 74, 0.45);
+  transform: rotateX(4deg) rotateY(8deg);
+  transform-origin: bottom;
+}
+.lx-app {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  height: 250px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #f5f7fa;
+  color: var(--lx-ink);
+  font-size: 8.5px;
+}
+.lx-app-top {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-bottom: 1px solid #e6ebf1;
+  background: #fff;
+  font-size: 9.5px;
+  font-weight: 700;
+}
+.lx-app-top b {
+  color: var(--lx-green);
+  font-family: var(--lx-disp);
+}
+.lx-app-user {
+  margin-left: auto;
+  color: var(--lx-muted);
+  font-weight: 500;
+}
+.lx-app-side {
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  padding: 8px 6px;
+  background: var(--lx-navy);
+  color: #c8d3e5;
+}
+.lx-app-side span {
+  padding: 5px 7px;
+  border-radius: 5px;
+}
+.lx-app-side span.on {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+.lx-app-main {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 7px;
+  padding: 8px;
+}
+.lx-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.lx-kpi {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.lx-kpi i {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+.lx-kpi b {
+  display: block;
+  font-size: 10px;
+}
+.lx-kpi small {
+  color: var(--lx-muted);
+  font-size: 7px;
+}
+.lx-k-blue {
+  background: #2f6fd6;
+}
+.lx-k-green {
+  background: #17693a;
+}
+.lx-k-gold {
+  background: #e3a92a;
+}
+.lx-k-red {
+  background: #d94545;
+}
+.lx-charts {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 6px;
+}
+.lx-chart {
+  padding: 7px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.wf .lx-chart h6 {
+  margin: 0 0 5px;
+  font-size: 8px;
+}
+.lx-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 90px;
+  padding: 0 4px;
+  border-bottom: 1px solid #e6ebf1;
+}
+.lx-bars div {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  gap: 2px;
+  height: 100%;
+}
+.lx-bars i {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  background: var(--lx-green);
+  animation: lx-grow 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.lx-bars i + i {
+  background: var(--lx-gold);
+}
+.lx-b1a {
+  height: 40%;
+}
+.lx-b1b {
+  height: 52%;
+  animation-delay: 0.1s;
+}
+.lx-b2a {
+  height: 55%;
+  animation-delay: 0.15s;
+}
+.lx-b2b {
+  height: 62%;
+  animation-delay: 0.2s;
+}
+.lx-b3a {
+  height: 48%;
+  animation-delay: 0.25s;
+}
+.lx-b3b {
+  height: 70%;
+  animation-delay: 0.3s;
+}
+.lx-b4a {
+  height: 66%;
+  animation-delay: 0.35s;
+}
+.lx-b4b {
+  height: 74%;
+  animation-delay: 0.4s;
+}
+.lx-b5a {
+  height: 80%;
+  animation-delay: 0.45s;
+}
+.lx-b5b {
+  height: 88%;
+  animation-delay: 0.5s;
+}
+.lx-donut {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lx-donut svg {
+  flex: none;
+  width: 70px;
+  height: 70px;
+}
+.lx-legend {
+  display: grid;
+  gap: 3px;
+  font-size: 7px;
+}
+.lx-legend span::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 4px;
+  border-radius: 2px;
+  background: var(--lx-c);
+}
+.lx-l-earned {
+  --lx-c: #17693a;
+}
+.lx-l-casual {
+  --lx-c: #e3a92a;
+}
+.lx-l-medical {
+  --lx-c: #16284a;
+}
+.lx-l-maternity {
+  --lx-c: #2f6fd6;
+}
+.lx-l-others {
+  --lx-c: #c9d1db;
+}
+.lx-base {
+  height: 14px;
+  margin: 0 -28px;
+  border-radius: 0 0 14px 14px;
+  background: linear-gradient(180deg, #d7dbe2, #a9b0bc);
+  box-shadow: 0 18px 30px -12px rgba(22, 40, 74, 0.4);
+}
+.lx-base::after {
+  content: '';
+  display: block;
+  width: 90px;
+  height: 5px;
+  margin: 0 auto;
+  border-radius: 0 0 6px 6px;
+  background: #9aa1ad;
+}
+
+/* Right: the sign-in card */
+.lx-card {
+  position: relative;
+  justify-self: end;
+  width: 100%;
+  max-width: 560px;
+  padding: 48px 52px 34px;
+  border-radius: 26px;
+  background: #fff;
+  box-shadow:
+    0 40px 80px -30px rgba(22, 40, 74, 0.35),
+    0 0 0 1px rgba(22, 40, 74, 0.04);
+}
+.lx-lang {
+  position: absolute;
+  top: 20px;
+  right: 22px;
+}
+.lx-page .fl-lang {
+  display: inline-flex;
+  gap: 4px;
+  margin-right: 0;
+  color: transparent;
+  font-size: 0;
+  line-height: normal;
+}
+.lx-page .fl-lang > span {
+  display: none;
+}
+.lx-page .fl-lang button {
+  min-height: 0;
+  padding: 4px 9px;
+  border: 1px solid var(--lx-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--lx-muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: normal;
+}
+.lx-page .fl-lang button[lang='hi'] {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 12px;
+}
+.lx-page .fl-lang button[aria-pressed='true'] {
+  border-color: var(--lx-green);
+  background: var(--lx-mint);
+  color: var(--lx-green);
+  text-decoration: none;
+}
+.lx-welcome {
+  color: var(--lx-navy);
+  font-family: var(--lx-disp);
+  font-size: 28px;
+  font-weight: 500;
+}
+.lx-lname {
+  margin-top: 2px;
+  color: var(--lx-green);
+  font-family: var(--lx-disp);
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+.lx-lname span {
+  font-weight: 500;
+}
+.lx-sys {
+  margin-top: 4px;
+  color: var(--lx-navy);
+  font-family: var(--lx-disp);
+  font-size: 24px;
+  font-weight: 700;
+}
+.lx-rule {
+  width: 78px;
+  height: 4px;
+  margin: 16px 0 26px;
+  border-radius: 4px;
+  background: var(--lx-gold);
+}
+.lx-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 22px;
+  padding: 4px;
+  border-radius: 12px;
+  background: #f1f5f2;
+}
+.lx-tabs button {
+  padding: 10px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: var(--lx-muted);
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+.lx-tabs button.on {
+  background: #fff;
+  color: var(--lx-green);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+/* "Sign in with OTP on registered mobile": the mode's title and the way back to the tabs. */
+.lx-mode {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px 12px;
+  margin-bottom: clamp(10px, 2vh, 22px);
+}
+.wf .lx-mode h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--lx-navy);
+  font-size: clamp(15px, 1.9vh, 18px);
+}
+.lx-mode h3 svg {
+  color: var(--lx-green);
+}
+.lx-mode .lx-link {
+  font-size: 13.5px;
+}
+.lx-mobile-hint {
+  margin: 2px 0 12px;
+}
+.lx-field {
+  margin-bottom: 18px;
+}
+.lx-field label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--lx-ink);
+  font-size: 16px;
+  font-weight: 600;
+}
+.lx-ctl {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 60px;
+  padding: 0 18px;
+  border: 1.5px solid var(--lx-line);
+  border-radius: 12px;
+  background: #fff;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.lx-ctl:focus-within {
+  border-color: var(--lx-green);
+  box-shadow: 0 0 0 4px rgba(23, 105, 58, 0.12);
+}
+.lx-ctl.err {
+  border-color: var(--lx-red);
+  box-shadow: 0 0 0 4px rgba(197, 59, 59, 0.1);
+}
+.lx-ctl.ok {
+  border-color: #3ba266;
+}
+.lx-ctl svg {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  color: #6b7686;
+}
+.lx-ctl input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--lx-ink);
+  font: inherit;
+  font-size: 16.5px;
+}
+/* Keep workspace touch-input rules from changing the reference's field text size. */
+.wf.lx-page .lx-ctl input:not(.lx-otp-input) {
+  font-size: 16.5px;
+}
+.lx-ctl input::placeholder {
+  color: #9aa3b0;
+}
+.lx-page .lx-ctl input:focus-visible {
+  outline: 0;
+}
+.lx-eye {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: #6b7686;
+}
+.lx-eye:hover {
+  background: #f1f5f2;
+}
+.lx-msg {
+  min-height: 18px;
+  margin-top: 6px;
+  color: var(--lx-red);
+  font-size: 13px;
+}
+.lx-caps {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--lx-gold-soft);
+  color: #9a6b00;
+  font-size: 13px;
+}
+.lx-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2px 0 22px;
+  font-size: 15px;
+}
+.lx-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--lx-body);
+  cursor: pointer;
+}
+.lx-page .lx-row input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--lx-green);
+}
+.lx-page .lx-link,
+.lx-foot button,
+.lx-otp-actions button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--lx-green);
+  font-weight: 600;
+}
+.lx-page .lx-link:hover,
+.lx-foot button:hover,
+.lx-otp-actions button:hover {
+  text-decoration: underline;
+}
+.lx-hint {
+  margin: -8px 0 16px;
+  color: var(--lx-muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.lx-page .fl-error {
+  margin: 0 0 14px;
+  font-size: 13.5px;
+}
+.lx-page .fl-hint {
+  margin: 0 0 14px;
+  font-size: 13px;
+}
+.lx-page .lx-signin {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 62px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--lx-green);
+  color: #fff;
+  font-family: var(--lx-disp);
+  font-size: 20px;
+  font-weight: 700;
+  box-shadow: 0 14px 28px -14px rgba(23, 105, 58, 0.8);
+  transition: 0.2s;
+}
+.lx-page .lx-signin:hover:not(:disabled) {
+  background: var(--lx-green-2);
+  transform: translateY(-1px);
+}
+.lx-page .lx-signin svg {
+  width: 22px;
+  height: 22px;
+  transition: transform 0.2s;
+}
+.lx-page .lx-signin:hover:not(:disabled) svg {
+  transform: translateX(4px);
+}
+.lx-page .lx-signin:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.lx-page .lx-signin[aria-busy='true'] {
+  opacity: 0.85;
+  pointer-events: none;
+}
+.lx-spin {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: lx-spin 0.8s linear infinite;
+}
+.lx-alt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 0;
+  color: var(--lx-muted);
+  font-size: 13.5px;
+}
+.lx-alt::before,
+.lx-alt::after,
+.lx-trust::before,
+.lx-trust::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--lx-line);
+}
+.lx-page .lx-otp {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 52px;
+  margin-top: 14px;
+  border: 1.5px solid var(--lx-line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--lx-navy);
+  font-weight: 600;
+}
+.lx-page .lx-otp:hover {
+  border-color: var(--lx-green);
+  color: var(--lx-green);
+}
+.lx-notice {
+  display: none;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--lx-mint);
+  color: var(--lx-green);
+  font-size: 13.5px;
+}
+.lx-notice.on {
+  display: block;
+  animation: lx-fade 0.3s;
+}
+.lx-otp-step .lx-notice.on {
+  margin: 0 0 14px;
+}
+.lx-trust {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 26px 0 0;
+  padding: 0;
+  color: var(--lx-muted);
+  font-size: 15.5px;
+  list-style: none;
+}
+.lx-trust li + li::before {
+  content: '|';
+  margin-right: 14px;
+  color: #c3cbd5;
+}
+.lx-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 18px;
+  color: var(--lx-muted);
+  font-size: 12.5px;
+}
+.lx-page .lx-foot button {
+  color: var(--lx-muted);
+  font-weight: 400;
+  text-align: left;
+}
+.lx-page .lx-foot button:last-child {
+  text-decoration: underline;
+}
+
+/* The OTP step */
+.lx-otp-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--lx-green);
+}
+.wf .lx-otp-head h3 {
+  margin: 0;
+  color: var(--lx-navy);
+  font-size: 22px;
+}
+.lx-otp-sent {
+  margin: 10px 0 18px;
+  color: var(--lx-body);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.lx-ctl .lx-otp-input {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 26px;
+  letter-spacing: 0.5em;
+}
+.lx-timer {
+  margin: 4px 0 0;
+  color: var(--lx-muted);
+  font-size: 13px;
+}
+.lx-timer.off {
+  color: var(--lx-red);
+  font-weight: 600;
+}
+.lx-otp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 16px;
+  font-size: 14px;
+}
+.lx-otp-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.lx-otp-actions button:disabled {
+  color: var(--lx-muted);
+  cursor: progress;
+}
+
+/* Entrance */
+.lx-rv {
+  animation: lx-in 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.lx-d1 {
+  animation-delay: 0.05s;
+}
+.lx-d2 {
+  animation-delay: 0.15s;
+}
+.lx-d3 {
+  animation-delay: 0.25s;
+}
+.lx-d4 {
+  animation-delay: 0.35s;
+}
+.lx-d5 {
+  animation-delay: 0.45s;
+}
+@keyframes lx-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+@keyframes lx-grow {
+  from {
+    height: 0;
+  }
+}
+@keyframes lx-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes lx-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/* The reference's responsive composition: stack the full hero and card below 1180 px. */
+@media (max-width: 1180px) {
+  .lx-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    padding: 32px 28px 140px;
+  }
+  .lx-card {
+    justify-self: center;
+    order: 2;
+  }
+  .lx-hero {
+    order: 1;
+  }
+  .lx-blob {
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    height: 60%;
+    border-radius: 50% 50% 0 0 / 20% 20% 0 0;
+  }
+  .lx-scene {
+    margin: 18px auto 0;
+  }
+  .wf .lx-hero h1,
+  .lx-feats,
+  .lx-lede {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 620px) {
+  .lx-grid {
+    gap: 22px;
+    padding: 24px 16px 120px;
+  }
+  .lx-scene,
+  .lx-hero .lx-feats,
+  .lx-hero .lx-lede {
+    display: none;
+  }
+  .wf .lx-hero h1 {
+    margin-top: 18px;
+    font-size: 40px;
+  }
+  .lx-mark {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+  }
+  .lx-mark svg {
+    width: 30px;
+    height: 30px;
+  }
+  .lx-nm {
+    font-size: 30px;
+  }
+  .lx-org {
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+  }
+  .lx-feats {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 18px;
+  }
+  .lx-ft:nth-child(3) {
+    border-left: 0;
+  }
+  .lx-ft i {
+    width: 54px;
+    height: 54px;
+  }
+  .lx-ft {
+    font-size: 13.5px;
+  }
+  .lx-card {
+    padding: 36px 22px 26px;
+    border-radius: 22px;
+  }
+  .lx-lname {
+    font-size: 42px;
+  }
+  .lx-sys {
+    font-size: 19px;
+  }
+  .lx-welcome {
+    font-size: 22px;
+  }
+  .lx-ctl {
+    height: 56px;
+  }
+  .lx-row {
+    font-size: 14px;
+  }
+  .lx-leaves {
+    width: 200px;
+    opacity: 0.35;
+  }
+  .lx-lang {
+    top: 14px;
+    right: 14px;
+  }
+  .lx-trust {
+    gap: 10px;
+    font-size: 13.5px;
+  }
+  .lx-trust li + li::before {
+    margin-right: 10px;
+  }
+}
+
+/* Touch targets (docs/architecture/RESPONSIVE_AND_PWA.md; e2e phone-layout): on a phone or any coarse
+   pointer every control of the sign-in card is at least 36px tall. The wireframe's text links,
+   language chips and the "Remember this device" label keep their look; only the tappable box grows.
+   The field's input fills its 56-60px box, so a tap anywhere on the field focuses it. */
+@media (max-width: 620px), (pointer: coarse) {
+  .lx-page .fl-lang button,
+  .lx-page .lx-link,
+  .lx-page .lx-foot button,
+  .lx-page .lx-otp-actions button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+  }
+  .lx-row label {
+    min-height: 36px;
+  }
+  .lx-ctl input {
+    align-self: stretch;
+    min-height: 36px;
+  }
+}
+
+/* Field: the wireframe's .rf-field (label 11.5px/800, input on #fbfcfe, focus ring #cfe0ff) */
+.lg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0 0 14px;
+  color: var(--ink);
+  font-size: 11.5px;
+  font-weight: 800;
+}
+.lg-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fbfcfe;
+  color: var(--soft);
+}
+.lg-input:focus-within {
+  border-color: var(--brand);
+  outline: 2px solid var(--fci-green-focus);
+}
+.lg-input input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: none;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12.6px;
+  font-weight: 400;
+}
+.lg-input input::placeholder {
+  color: var(--soft);
+}
+.lg-input button {
+  display: grid;
+  place-items: center;
+  padding: 4px;
+  border: 0;
+  background: none;
+  color: var(--mut);
+}
+/* Primary action: the wireframe's .btn.pri, full width */
+.lg-submit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid var(--brand);
+  border-radius: 8px;
+  background: var(--brand);
+  color: #fff;
+  font-size: 12.2px;
+  font-weight: 700;
+}
+.lg-submit:hover {
+  background: var(--fci-green-hover);
+}
+.lg-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.lg-submit svg {
+  transition: transform 0.2s;
+}
+.lg-submit:hover svg {
+  transform: translateX(3px);
+}
+/* Help and password-reset dialog: a wireframe card over the wireframe's scrim */
+.lg-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(16, 24, 40, 0.44);
+}
+.wf .lg-modal {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  padding: 24px;
+  color: var(--ink);
+  animation: lg-enter 0.2s;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+.lg-modal > svg {
+  color: var(--brand);
+}
+.wf .lg-modal h2 {
+  margin: 12px 0 8px;
+  font-size: 18px;
+}
+.lg-modal p {
+  color: var(--mut);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+.lg-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--mut);
+}
+.lg-close:hover {
+  background: var(--gray);
+  color: var(--ink);
+}
+.lg-help-contact {
+  display: flex;
+  justify-content: space-between;
+  margin: 16px 0;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: var(--infob);
+  color: var(--ink);
+  font-size: 12px;
+}
+
+@keyframes lg-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes lg-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lx-page *,
+  .lg-backdrop * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .lx-tabs button.on {
+    outline: 2px solid CanvasText;
+  }
+  .lx-rule {
+    background: CanvasText;
+  }
+}

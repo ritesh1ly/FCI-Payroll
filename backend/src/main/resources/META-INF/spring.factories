@@ -1,0 +1,2 @@
+org.springframework.boot.logging.structured.StructuredLoggingJsonMembersCustomizer=\
+in.gov.fci.payroll.platform.logging.MaskingJsonMembersCustomizer

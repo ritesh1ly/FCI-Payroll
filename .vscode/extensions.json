@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "vscjava.vscode-java-pack",
+    "vmware.vscode-boot-dev-pack",
+    "vscjava.vscode-gradle",
+    "dbaeumer.vscode-eslint",
+    "sonarsource.sonarlint-vscode"
+  ]
+}

@@ -1,0 +1,63 @@
+# Batch mode (spring.profiles.active=<env>,batch): the job instance. Loaded only with the batch
+# profile. It owns the scheduler (BatchSchedulingConfig) and never migrates the schema or serves
+# browser sessions; the online instance migrates first (start order: H2/DB, online, batch).
+# Every tunable of the batch module is here; reference: docs/BATCH_DESIGN.md, "Configuration".
+
+spring:
+  flyway:
+    enabled: false
+  autoconfigure:
+    exclude:
+      # No browser sessions on the batch instance (Boot 4: the JDBC store is its own configuration).
+      - org.springframework.boot.session.autoconfigure.SessionAutoConfiguration
+      - org.springframework.boot.session.jdbc.autoconfigure.JdbcSessionAutoConfiguration
+      # No browser login on the batch instance (deny-all): no generated in-memory user either.
+      - org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
+  task:
+    scheduling:
+      pool:
+        size: 3
+      thread-name-prefix: fci-sched-
+  batch:
+    job:
+      enabled: false          # jobs start only from the queue, never at start-up
+    jdbc:
+      initialize-schema: never  # job repository tables come from Flyway (V011)
+
+fci:
+  common:
+    app-name: payroll-batch
+  logging:
+    file-name: batch            # batch.json, batch-security-audit.json (fci-logback.xml)
+  batch:
+    poller:
+      enabled: true            # false: no scheduler at all (tests drive jobs directly)
+      interval: 5s             # how often the queue, the control commands and recovery are checked
+      max-concurrent-jobs: 2   # job threads of this node
+      claim-batch-size: 10     # rows locked per claim (SELECT ... FOR UPDATE SKIP LOCKED)
+    chunk:
+      size: 100                # commit interval (items per transaction)
+      page-size: 100           # reader page size (JdbcPagingItemReader)
+    partition:
+      grid-size: 4             # partitions per partitioned step
+      pool-size: 4             # worker threads shared by all partitioned steps of this node
+    retry:
+      limit: 3                 # attempts for transient DB errors (deadlock, lock timeout)
+      initial-interval: 500ms
+      multiplier: 2.0
+      max-interval: 10s
+    skip:
+      limit: 100               # bad records skipped per step before the step fails (a technical default, no source value: CLR-133, BMAD TR-074)
+    lock:
+      heartbeat-interval: 30s  # job lock refresh while chunks commit
+      stale-after: 3m          # a lock older than this belongs to a dead node (crash recovery)
+    recovery:
+      auto-restart: false      # true: restart recovered jobs automatically; false: manual Restart on C-13
+    restart-window: 72h        # Resume / Restart allowed up to this long after a run ended (the "configured period" of SRS-15-27; 72h is no FCI value: CLR-132, BMAD TR-079)
+    shutdown-timeout: 60s      # on shutdown, wait this long for running jobs to pause
+    schedules:
+      interface-pull: "0 30 1 * * *"   # nightly HRMS pull (IST)
+      month-end: "0 0 20 L * *"        # last day of the month, 20:00 IST
+    interfaces:
+      hrms-source: ""                  # HRMS interface endpoint (OQ-8); empty: not configured
+      # retry, back-off, time limit and breaker: interface_config of HRMS_BULK_RECONCILE (X-03, BR-INT-008)

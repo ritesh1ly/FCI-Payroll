@@ -1,0 +1,66 @@
+/*
+ * Form-field borders, in one place (owner 2026-10-30: fields plain to see; one file to change).
+ * The values are the --fci-field-* tokens of src/styles/brand.css; this file only applies them.
+ * Loaded after workspace.css (app/layout.tsx). Each field's padding, size and font stay with its
+ * own rule; its error (rf-invalid) and focus colours win here through their higher specificity.
+ * The sign-in page keeps the wireframe's own field box (.lx-ctl in login.css).
+ */
+
+/* Fields styled by the workspace (and their search wrappers, which draw the box around a bare input). */
+.wf select,
+.wf .fld input,
+.wf .fld select,
+.wf .rf-field input,
+.wf .rf-field select,
+.wf .rf-field textarea,
+.wf .search .in,
+.wf .lsearch,
+.fl-field input,
+.fl-field textarea {
+  border: var(--fci-field-border);
+}
+
+/*
+ * Any other text box, drop-down or text area: the field border in the workspace shape. :where()
+ * keeps this rule below every styled field, so a wrapper that draws the box keeps its bare input.
+ */
+.wf
+  :where(
+    input:not(
+      [type='checkbox'],
+      [type='radio'],
+      [type='range'],
+      [type='hidden'],
+      [type='file'],
+      [type='color'],
+      [type='submit'],
+      [type='button'],
+      [type='reset'],
+      [type='image']
+    ),
+    select,
+    textarea
+  ) {
+  border: var(--fci-field-border);
+  border-radius: var(--fci-field-radius);
+  background: var(--fci-field-bg);
+  color: var(--ink);
+}
+.wf :where(input, select, textarea):where(:focus-visible) {
+  border-color: var(--fci-field-focus-color);
+}
+.wf :where(input, select, textarea):where([aria-invalid='true']) {
+  border-color: var(--fci-field-invalid-color);
+  background: var(--fci-field-invalid-bg);
+}
+.wf :where(input, select, textarea):where(:disabled) {
+  background: var(--fci-field-disabled-bg);
+  color: var(--mut);
+}
+
+/* Windows high contrast: the system draws field borders itself. */
+@media (forced-colors: active) {
+  .wf :where(input, select, textarea) {
+    border-color: FieldText;
+  }
+}

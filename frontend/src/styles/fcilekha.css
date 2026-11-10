@@ -1,0 +1,492 @@
+/*
+ * FCILekha additions on top of the verbatim live stylesheets (src/styles/live): only what the live
+ * site has no rule for (errors, OTP and reason dialogs, the language toggle, the account menu).
+ * Colours are the live tokens (:root in live/global.css). No inline styles anywhere (CSP).
+ */
+html[lang='hi'] body,
+html[lang='hi'] input,
+html[lang='hi'] button,
+html[lang='hi'] select {
+  font-family: var(--font-geist-sans), var(--font-devanagari), sans-serif;
+}
+html[lang='hi'] .lg-page,
+html[lang='hi'] .lg-page input,
+html[lang='hi'] .lg-page button {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, var(--font-devanagari),
+    sans-serif;
+}
+
+.fl-error {
+  color: var(--bad, #dc2626);
+  background: var(--badb, #fef2f2);
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 8px 0;
+}
+.fl-error .fl-ref,
+.fl-error .fl-action,
+.fl-error .fl-violation {
+  display: block;
+  font-weight: 400;
+  font-size: 11px;
+  margin-top: 2px;
+}
+.fl-hint {
+  color: var(--mut, #64748b);
+  font-size: 11.5px;
+  margin: 6px 0;
+}
+/* M-08: a formula or long value may break anywhere rather than widen the table. */
+.fl-wrap-any {
+  overflow-wrap: anywhere;
+  max-width: 28rem;
+}
+.fl-list {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+/* M-08: the formula grammar beside the formula field (SRS-19-15). */
+.fl-vocabulary {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 2px 10px;
+  margin: 6px 0 0;
+  font-size: 11.5px;
+}
+.fl-vocabulary dt {
+  color: var(--mut, #64748b);
+}
+.fl-vocabulary dd {
+  margin: 0;
+  font-family: ui-monospace, monospace;
+  overflow-wrap: anywhere;
+}
+.fl-banner {
+  color: #1d4ed8;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.fl-empty {
+  color: var(--mut, #64748b);
+  text-align: center;
+  padding: 24px;
+  font-size: 12px;
+}
+.fl-bad {
+  color: var(--bad, #dc2626);
+}
+.fl-tico-info {
+  background: var(--infob, #e0f2fe);
+}
+.fl-tico-ok {
+  background: var(--okb, #ecfdf5);
+}
+.fl-tico-bad {
+  background: var(--badb, #fef2f2);
+}
+.fl-tico-warn {
+  background: var(--warnb, #fffbeb);
+}
+
+/* EN | हिं toggle: sits beside "Need help?" without changing the live line height. */
+.fl-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  line-height: 1;
+  color: #52745c;
+  margin-right: 14px;
+}
+.fl-lang button {
+  background: none;
+  border: 0;
+  padding: 0 2px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  border-radius: 4px;
+}
+.fl-lang button[lang='hi'] {
+  font-family: var(--font-devanagari), sans-serif;
+  font-size: 13px;
+}
+.fl-lang button[aria-pressed='true'] {
+  font-weight: 800;
+  color: #153f2b;
+  text-decoration: underline;
+}
+.fl-lang-top {
+  font-size: 11px;
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 6px;
+  padding: 2px 6px;
+  background: #fff;
+}
+
+/* Dialogs (OTP, reason, temporary password) in the live card language. */
+.fl-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgb(15 23 42 / 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.fl-modal {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid var(--line, #e2e8f0);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 0.18);
+  width: min(420px, 100%);
+  padding: 18px;
+  /* A long form (M-10: twelve dates) scrolls inside the dialog, so its buttons stay reachable. */
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+}
+/* A dialog holding a table (the History button). */
+.fl-modal.fl-modal-wide {
+  width: min(1100px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+}
+/* Two stores side by side, never merged (native trail | Legacy Audit, SRS-20-22). */
+.fl-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.fl-modal h2 {
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0 0 8px;
+  color: var(--ink, #0f172a);
+}
+.fl-modal p {
+  font-size: 12px;
+  color: var(--mut, #64748b);
+}
+.fl-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  margin: 10px 0;
+  color: var(--ink, #0f172a);
+}
+.fl-field input,
+.fl-field textarea {
+  border-radius: 7px;
+  padding: 7px 9px;
+  font: inherit;
+  font-weight: 400;
+  font-size: 12.5px;
+}
+.fl-field input:focus,
+.fl-field textarea:focus {
+  outline: 2px solid #e4e4e7;
+  border-color: var(--brand, #166534);
+}
+.fl-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+.fl-form {
+  padding: 14px 15px;
+}
+.fl-inline-form {
+  border-top: 1px solid var(--line, #e2e8f0);
+  margin-top: 12px;
+  padding: 12px 0 0;
+}
+.fl-password {
+  width: min(460px, 100%);
+}
+.fl-centered {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 16px;
+}
+.fl-inline {
+  display: inline;
+}
+.fl-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--mut, #64748b);
+}
+.fl-matrix td,
+.fl-matrix th {
+  text-align: center;
+}
+.fl-matrix td:first-child,
+.fl-matrix th:first-child {
+  text-align: left;
+}
+
+/* Account menu under the avatar. */
+.fl-account {
+  position: absolute;
+  right: 0;
+  top: 34px;
+  z-index: 60;
+  min-width: 220px;
+  background: #fff;
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgb(0 0 0 / 0.12);
+  padding: 6px;
+}
+.fl-account-who {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px 8px;
+  border-bottom: 1px solid var(--line-subtle, #f1f5f9);
+  margin-bottom: 4px;
+  font-size: 11.5px;
+}
+.fl-account-who span {
+  color: var(--mut, #64748b);
+  font-size: 10.5px;
+}
+.fl-account button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border: 0;
+  background: none;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+  text-align: left;
+}
+.fl-account button:hover {
+  background: #052e16;
+  color: #fff;
+}
+
+/* C-13 Batch Jobs: pager, sortable column headers, inline links, step progress. */
+.pager {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+th > button.sort,
+button.link {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+button.link {
+  color: #166534;
+  text-decoration: underline;
+}
+th > button.sort:focus-visible,
+button.link:focus-visible {
+  outline: 2px solid #166534;
+  outline-offset: 2px;
+}
+progress {
+  width: 7rem;
+  height: 0.6rem;
+  accent-color: #166534;
+}
+
+/* The page behind an open drawer does not scroll (Workspace toggles the class on <html>). */
+html.fl-noscroll,
+html.fl-noscroll body {
+  overflow: hidden;
+}
+
+/* Wireframe v6.1 layout helpers (the pack sets these inline; the CSP forbids inline styles). */
+.fl-mt {
+  margin-top: 14px;
+}
+.fl-ic-info {
+  background: var(--infob);
+}
+.fl-ic-warn {
+  background: var(--warnb);
+}
+.fl-ic-bad {
+  background: var(--badb);
+}
+.fl-ic-ok {
+  background: var(--okb);
+}
+.fl-ic-gray {
+  background: var(--gray);
+}
+.fl-ic-pur {
+  background: var(--purb);
+}
+
+/* Inactivity warning countdown (shell/components/IdleGuard.tsx). */
+.fl-countdown {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 8px 0 14px;
+}
+
+/* Pager of both pagination components (shared/ui/Pagination.tsx). */
+.fl-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-top: 10px;
+  font-size: 13px;
+}
+.fl-pager-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.fl-pager-of {
+  padding: 0 4px;
+}
+.fl-pager-size {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.fl-pager .btn {
+  min-height: 32px;
+}
+.fl-pager-pages {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.fl-pager-pages .btn[aria-current='page'] {
+  font-weight: 700;
+  border-color: var(--pri, #0b5394);
+}
+.fl-pager-gap {
+  padding: 0 2px;
+}
+.fl-pager-goto {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+/* A long page (up to 100 rows) scrolls inside its card under a sticky header (X-pagination). */
+.fl-table-scroll {
+  max-height: 70vh;
+  overflow: auto;
+}
+.fl-table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--card, #fff);
+}
+
+/* D-01 Home - Cycle Status (plan 05 phase 05i): the cycle states of the scope as a row of counts. */
+.d01-states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  font-size: 12px;
+}
+.d01-states .m {
+  color: var(--mut, #64748b);
+}
+.fl-row-warn td {
+  background: var(--warnb, #fffbeb);
+}
+
+/* C-09 General (Simulation) Run (SRS C-09): an amber banner and a SIMULATION watermark, styled apart from C-01 to C-08. */
+.sim-banner {
+  color: #78350f;
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.sim-output {
+  position: relative;
+}
+.sim-output::after {
+  content: attr(data-watermark);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(32px, 8vw, 88px);
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  color: rgba(217, 119, 6, 0.12);
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+
+/*
+ * Shared TextAreaField: the plain-text hint and the characters used, under the field (R-ASCII).
+ * Drawn from data attributes, so a label that wraps the field keeps the field's name as its text.
+ */
+.fl-ta-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--mut, #64748b);
+  font-size: 11px;
+  font-weight: 400;
+  margin-top: 2px;
+}
+.fl-ta-meta::before {
+  content: attr(data-hint);
+}
+.fl-ta-meta::after {
+  content: attr(data-count);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.fl-ta-meta.fl-bad {
+  color: var(--bad, #dc2626);
+}
+
+/* In a wireframe-kit table the pager is a row of the table: it stays in view under a long page. */
+.fl-table-scroll tr.fl-state-pager td {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: var(--card, #fff);
+}

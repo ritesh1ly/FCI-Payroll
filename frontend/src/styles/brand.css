@@ -1,0 +1,60 @@
+/*
+ * The FCILekha brand: the one place its colours and type are set (owner 2026-10-29: the login
+ * page's green, gold and white carried to every page; brand values kept together so a change of
+ * brand is a change of this file). Every stylesheet reads these tokens: the workspace (.wf in
+ * workspace.css), the login page (.lx-page in login.css) and the shared additions (fcilekha.css).
+ * The same values for places CSS cannot reach (browser theme colour, web manifest) are in
+ * src/shared/ui/brand.ts and public/manifest.webmanifest; keep the three in step.
+ *
+ * Status colours (ok, warn, bad, info) are not brand: they keep their meaning in workspace.css.
+ * Contrast: green and navy text on white pass WCAG AA; gold is for rules, borders and fills, never
+ * small text on white (--fci-gold-text is the readable gold).
+ */
+:root {
+  /* Green: the primary colour (buttons, active navigation, links, focus). */
+  --fci-green: #17693a;
+  --fci-green-hover: #1f8048;
+  --fci-green-dark: #0f4f2b;
+  --fci-green-soft: #e3f2e7;
+  --fci-green-line: #c9e3d1;
+  --fci-green-focus: #b9dcc5;
+  --fci-mint: #eef7f0;
+
+  /* Gold: the accent (rules under titles, the active marker, highlights). */
+  --fci-gold: #d6a531;
+  --fci-gold-soft: #fbf1d6;
+  --fci-gold-text: #7a5a06;
+
+  /* Navy: headings and dark bands. */
+  --fci-navy: #16284a;
+  --fci-navy-2: #1e3560;
+  --fci-on-navy-muted: #c3cfe0;
+
+  /* White and the green-tinted neutrals of the page. */
+  --fci-white: #fff;
+  --fci-page: #f4faf5;
+  --fci-tint: #f6faf7;
+  --fci-ink: #1a2433;
+
+  /*
+   * Form fields (text boxes, drop-downs, text areas, search boxes): every border, radius and state
+   * colour, so the look of all fields changes here (owner 2026-10-30). The border is 3:1 against
+   * white (WCAG 1.4.11 non-text contrast), so an empty field is plain to see on a white card. The
+   * rules that apply them are in src/styles/forms.css.
+   */
+  --fci-field-border-width: 1px;
+  --fci-field-border-style: solid;
+  --fci-field-border-color: #8592a6;
+  --fci-field-border: var(--fci-field-border-width) var(--fci-field-border-style)
+    var(--fci-field-border-color);
+  --fci-field-radius: 7px;
+  --fci-field-bg: #fff;
+  --fci-field-focus-color: var(--fci-green);
+  --fci-field-invalid-color: #c53b3b;
+  --fci-field-invalid-bg: #fff5f5;
+  --fci-field-disabled-bg: #f4f6fa;
+
+  /* Type: self-hosted (CSP font-src 'self'); the serif is the login headline's italic line. */
+  --fci-font: var(--font-geist-sans), var(--font-devanagari), system-ui, sans-serif;
+  --fci-font-serif: Georgia, 'Times New Roman', var(--font-devanagari), serif;
+}

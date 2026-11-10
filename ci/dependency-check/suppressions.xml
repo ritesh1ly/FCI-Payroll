@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  OWASP Dependency-Check suppressions.
+  Every entry MUST carry: the CVE, the affected artefact, a justification (why it is not exploitable here),
+  the approver, and an expiry date (until="YYYY-MM-DDZ") so it is re-reviewed. See docs/security/pre-scan-review.md.
+-->
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+</suppressions>

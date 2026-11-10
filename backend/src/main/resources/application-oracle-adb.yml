@@ -1,0 +1,27 @@
+# LOCAL MACHINES ONLY (owner 2026-11-01): the cloud Oracle Autonomous Database (FCIPAY, Oracle 26ai) through its
+# wallet, on top of profile oracle. DEV, UAT and production use an on-premises Oracle without a wallet
+# (application-oracle.yml); StartupGuards refuse this profile in dev, a real UAT and prod.
+#   bootRunOnline / bootRunBatch -Pfci.db=oracle, or deploy-local.ps1 -Database Oracle (profiles oracle,oracle-adb).
+#
+# NO SECRET HERE: the schema owner's password is the file spring.datasource.password in fci.oracle.secrets-dir
+# (git-ignored; one file per property, ADR-0013). docs/db/ORACLE_LOCAL.md.
+spring:
+  # OD-151 (owner 2026-11-09): no Flyway on the local Oracle stack. Its schema and data come from the install
+  # kit, run by the owner in the one order 1 DROP, 2 DDL, 3 DML, 4 COMPILE INVALID (db/oracle-setup,
+  # docs/db/INSTALL_KIT.md); the application only validates it (spring.jpa.hibernate.ddl-auto=validate).
+  # DEV, UAT and production (profile oracle without oracle-adb) keep Flyway: it upgrades a database that
+  # holds data, which the kit, a full rebuild, cannot.
+  flyway:
+    enabled: false
+  config:
+    import:
+      - optional:configtree:${fci.oracle.secrets-dir:../secrets/oracle}/
+  datasource:
+    # A tnsnames.ora alias of the wallet (high / medium / low / tp / tpurgent); the wallet folder holds
+    # tnsnames.ora, sqlnet.ora and the auto-login cwallet.sso (read by oraclepki). TCPS, ssl_server_dn_match.
+    url: jdbc:oracle:thin:@${fci.oracle.tns-alias:fcipay_medium}?TNS_ADMIN=${fci.oracle.wallet-dir}
+    hikari:
+      # A cloud database over the WAN: the first TCPS handshake takes seconds.
+      connection-timeout: 30000
+      data-source-properties:
+        oracle.net.CONNECT_TIMEOUT: 20000

@@ -1,0 +1,108 @@
+# Build output
+target/
+build/
+out/
+# Eclipse / VS Code Java compiler output and Python bytecode
+bin/
+__pycache__/
+frontend/.next/
+frontend/out/
+frontend/node_modules/
+# Any node_modules folder, e.g. one a stray npm install creates at the repository root.
+node_modules/
+frontend/coverage/
+frontend/reports/mutation/
+frontend/.stryker-tmp/
+frontend/playwright-report/
+frontend/test-results/
+frontend/blob-report/
+frontend/playwright-results.json
+*.war
+
+# IDE
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# Logs
+logs/
+*.log
+
+# Secrets — never commit (see docs/adr/0013-secrets-and-configuration.md)
+.env
+.env.*
+!.env.example
+*.p12
+*.jks
+*.pem
+*.key
+secrets/
+
+# Scan output
+*.fpr
+dependency-check-report.*
+zap-report.*
+sbom/
+
+# Gradle
+.gradle/
+.kotlin/
+build-logic/.gradle/
+scripts/local/generated/
+scripts/local/runtime/
+scripts/local/runtime-*/
+frontend/src/generated/
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# H2 file databases and heap dumps (the interim H2 runs in memory; never commit data)
+*.mv.db
+*.trace.db
+*.hprof
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# BMad Method (local agent framework, its skills and its generated output)
+_bmad/
+_bmad-output/
+.claude/skills/bmad-*/
+
+# Documentation — kept locally only (project owner, 2026-11-10: too large for the free-tier remote).
+docs/
+
+# Database scripts — kept locally only (project owner, 2026-11-10: too large for the free-tier remote).
+# Covers Flyway migrations, rollbacks, seeds, install / Oracle setup bundles and volume data under db/.
+# NOTE: a fresh clone has no db/ folder; copy it in before running the backend or its tests.
+db/**
+!db/README.md
+*.dmp
+*.sql.gz
+
+# Editor / OS clutter
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+*.orig
+*.rej
+desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+
+# Claude Code per-user settings
+.claude/settings.local.json
+
+# Local tool caches
+.eslintcache
+.npm/
+.pnpm-store/
+.cache/
+.java-version
+.sdkmanrc

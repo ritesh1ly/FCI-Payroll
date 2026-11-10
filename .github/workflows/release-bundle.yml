@@ -1,0 +1,236 @@
+# Client delivery bundle, built on demand only (Actions > release-bundle > Run workflow). There is no
+# automatic trigger: deliveries are cut manually from the branch or tag chosen in the run dialog.
+#
+#   backend   fci-payroll.war (one WAR, profiles online / batch; Flyway scripts of db/ inside). The release
+#             WAR has NO H2 (owner 2026-11-01: DEV, SIT, UAT and production run on Oracle on premises; H2 is
+#             only in local builds, -Pfci.h2=true): the build refuses a release WAR that holds any.
+#   frontend  the Next.js standalone SSR server (server.js + .next/static + public), built on Linux
+#             for the Linux hosts of config/systemd
+#   bundle    the layout scripts/install-release.sh installs: VERSION, fci-payroll.war, web/
+#             (extracted server), the server scripts, plus config/, the Oracle DB scripts and rollbacks
+#             (db/), the runbook and architecture, BUILD-INFO.txt and SHA256SUMS, as one artifact
+#             fci-payroll-<version> to download and hand over.
+#
+# With "run_checks" (default) the bundle is cut only if the static gates pass (./gradlew :backend:staticCheck,
+# npm run check:static). No test suite runs in GitHub Actions (project owner, 2026-10-25): run
+# ./gradlew :backend:check and npm run check locally before cutting a delivery.
+#
+# Release tag: once the bundle is uploaded, the "tag" job creates the annotated tag v<version> on the
+# exact commit that was packaged (GITHUB_SHA) and pushes it, so a tag always means "delivered from
+# here". Only a gated run is tagged (run_checks); a version already tagged is refused before any
+# build. Only the tag job may write to the repository (contents: write); every other job reads.
+# Third-party actions are pinned to major versions, as in ci.yml.
+name: release-bundle
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Delivery version, e.g. 0.1.0 (names the bundle; letters, digits, dot, plus, dash)"
+        required: true
+        type: string
+      run_checks:
+        description: "Run the backend and frontend quality gates before packaging"
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-bundle-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Version format, and not released before
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if ! [[ "$VERSION" =~ ^[0-9A-Za-z][0-9A-Za-z.+-]{0,39}$ ]]; then
+            echo "::error::version must be letters, digits, dot, plus or dash (max 40), got '$VERSION'"
+            exit 1
+          fi
+          if [[ "$VERSION" == v* || "$VERSION" == V* ]]; then
+            echo "::error::give the version without the 'v' (e.g. 0.1.0); the tag adds it: v0.1.0"
+            exit 1
+          fi
+          # A delivery version is cut once: refuse it before building if its tag already exists.
+          if [ -n "$(git ls-remote --tags origin "refs/tags/v$VERSION")" ]; then
+            echo "::error::v$VERSION is already tagged: a released version is never cut again, choose a new one"
+            exit 1
+          fi
+
+  backend:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Static gate (format, compile with -Werror, SAST)
+        if: inputs.run_checks
+        run: ./gradlew :backend:staticCheck --continue
+      - name: Build the release WAR (no H2)
+        run: ./gradlew :backend:bootWar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-binaries
+          path: |
+            backend/build/libs/fci-payroll.war
+          if-no-files-found: error
+          retention-days: 7
+
+  frontend:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Static gate (types, lint, format, i18n parity, E2E trace tags)
+        if: inputs.run_checks
+        run: npm run check:static
+      - name: Build the standalone SSR server
+        run: npm run build
+      - name: Assemble the server directory (as scripts/local/deploy-local.ps1 deploys it)
+        run: |
+          rm -rf ../dist/web
+          mkdir -p ../dist/web
+          cp -R .next/standalone/. ../dist/web/
+          mkdir -p ../dist/web/.next
+          cp -R .next/static ../dist/web/.next/static
+          if [ -d public ]; then cp -R public ../dist/web/public; fi
+          tar -czf ../dist/fci-payroll-web.tar.gz -C ../dist/web .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-bundle
+          path: dist/fci-payroll-web.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  bundle:
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      VERSION: ${{ inputs.version }}
+    outputs:
+      war_sha256: ${{ steps.assemble.outputs.war_sha256 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: backend-binaries
+          path: staging/app
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-bundle
+          path: staging/web
+      - name: Assemble the delivery (the layout scripts/install-release.sh verifies)
+        id: assemble
+        run: |
+          out="fci-payroll-$VERSION"
+          mkdir -p "$out"/{web,config,db/migration,db/rollback,docs}
+          printf '%s' "$VERSION" > "$out/VERSION"
+          cp staging/app/fci-payroll.war "$out/"
+          # No H2 in a delivery: servers run on Oracle only (owner 2026-11-01).
+          if unzip -l staging/app/fci-payroll.war | grep -Eq 'WEB-INF/lib/h2-|/persistence/h2/|db/migration/h2/'; then
+            echo "::error::the release WAR contains H2"; exit 1
+          fi
+          # The Next.js standalone server, extracted (install-release.sh expects web/server.js).
+          tar -xzf staging/web/fci-payroll-web.tar.gz -C "$out/web"
+          test -f "$out/web/server.js"
+          # Server scripts: install / roll back, backup, smoke test.
+          cp scripts/install-release.sh scripts/smoke-test.sh "$out/"
+          # Server configuration; the SpotBugs filter is a build file, not a server file.
+          cp -R config/. "$out/config/"
+          rm -rf "$out/config/spotbugs"
+          # The DBA's copy of the scripts Flyway applies from the WAR, with their rollbacks.
+          cp -R db/migration/common db/migration/oracle "$out/db/migration/"
+          cp -R db/rollback/oracle "$out/db/rollback/"
+          cp docs/operations/runbook.md docs/ARCHITECTURE.md "$out/docs/"
+          {
+            echo "FCILekha Payroll delivery $VERSION"
+            echo "commit:      $GITHUB_SHA"
+            echo "ref:         $GITHUB_REF_NAME"
+            echo "built:       $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "quality:     ${{ inputs.run_checks && 'backend check + frontend check passed' || 'checks skipped on request' }}"
+            echo "run:         $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo
+            echo "Install: sudo ./install-release.sh .   (verifies SHA256SUMS and the Oracle profile, switches, smoke-tests;"
+            echo "         sudo ./install-release.sh --rollback switches back). Procedures: docs/runbook.md."
+            echo
+            echo "fci-payroll.war   both Tomcat instances (FCI_MODE online / batch)"
+            echo "web/              Next.js server (node server.js, config/systemd/fci-frontend.service)"
+            echo "config/           NGINX, Tomcat, systemd, environment templates"
+            echo "db/               Oracle DDL / data scripts (applied by Flyway at start) and rollbacks"
+            echo
+            echo "The demo seed (db/seed) is inside the WAR but runs only with the 'demo' profile; never enable it in production."
+          } > "$out/BUILD-INFO.txt"
+          (cd "$out" && find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS)
+          echo "OUT=$out" >> "$GITHUB_ENV"
+          echo "war_sha256=$(sha256sum "$out/fci-payroll.war" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fci-payroll-${{ inputs.version }}
+          path: ${{ env.OUT }}
+          if-no-files-found: error
+          retention-days: 90
+      - name: Summary
+        run: |
+          {
+            echo "### fci-payroll-$VERSION"
+            echo
+            echo '```'
+            cat "$OUT/SHA256SUMS"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # The release tag, last: only a gated bundle that was built and uploaded is tagged.
+  tag:
+    needs: bundle
+    if: inputs.run_checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ inputs.version }}
+      WAR_SHA256: ${{ needs.bundle.outputs.war_sha256 }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create and push the annotated tag v${{ inputs.version }} on the packaged commit
+        run: |
+          tag="v$VERSION"
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              tag -a "$tag" "$GITHUB_SHA" -F - <<EOF
+          FCILekha Payroll delivery $VERSION
+
+          commit:   $GITHUB_SHA
+          ref:      $GITHUB_REF_NAME
+          quality:  backend check + frontend check passed
+          war:      fci-payroll.war sha256 $WAR_SHA256
+          bundle:   fci-payroll-$VERSION (artifact of $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
+          EOF
+          # Fails if the tag appeared meanwhile (another run): a tag is never moved or overwritten.
+          git push origin "refs/tags/$tag"
+          echo "Tagged $tag on $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"

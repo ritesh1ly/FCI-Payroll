@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Reviewed SpotBugs / FindSecBugs findings that are accepted, each with its reason (review of
+  2026-10-20, docs/tracker/SESSION_LOG.md episode 4). Anything not listed here fails the build. Keep
+  entries narrow (class + pattern); a whole pattern is excluded only where it is noise by design.
+-->
+<FindBugsFilter>
+    <!-- Spring beans keep their injected collaborators and JPA entities / records hand out their
+         fields: storing and returning references is the framework's model, not a leak of mutable
+         internal state. (SpotBugs 4.8 raises these on nearly every Spring class.) -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+    <!-- Finalizer attack on a partially built object: irrelevant for Spring-managed singletons and
+         JPA entities, which are never subclassed by untrusted code. -->
+    <Match>
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
+    <!-- JdbcTemplate.update(PreparedStatementCreator, KeyHolder) owns and closes the statement the
+         lambda creates. -->
+    <Match>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE"/>
+        <Or>
+            <Class name="in.gov.fci.payroll.employee.orchestration.HrmsChangeService"/>
+            <Class name="in.gov.fci.payroll.employee.orchestration.HrmsOrderService"/>
+            <Class name="in.gov.fci.payroll.employee.orchestration.HrmsUpdateRequestService"/>
+            <Class name="in.gov.fci.payroll.nps.orchestration.NpsIntakeService"/>
+            <Class name="in.gov.fci.payroll.leave.orchestration.LeaveIntakeService"/>
+            <Class name="in.gov.fci.payroll.leave.orchestration.LeaveParameterService"/>
+            <Class name="in.gov.fci.payroll.leave.orchestration.LeaveEncashmentService"/>
+            <Class name="in.gov.fci.payroll.settlement.orchestration.SettlementCaseOpener"/>
+            <Class name="in.gov.fci.payroll.loans.orchestration.LoanWriter"/>
+            <Class name="in.gov.fci.payroll.tax.orchestration.TaxWhatIfService"/>
+            <Class name="in.gov.fci.payroll.payroll.batch.arrear.ArrearEvents"/>
+            <Class name="in.gov.fci.payroll.payroll.batch.computation.ResultWriter"/>
+            <Class name="in.gov.fci.payroll.payroll.batch.cycle.CycleRuns"/>
+            <Class name="in.gov.fci.payroll.payroll.orchestration.CycleCorrections"/>
+            <Class name="in.gov.fci.payroll.payroll.orchestration.DirectPayrollService"/>
+            <Class name="in.gov.fci.payroll.payroll.orchestration.ReleaseSuspensionService"/>
+            <Class name="in.gov.fci.payroll.payroll.orchestration.SimulationRecords"/>
+            <Class name="in.gov.fci.payroll.eseva.orchestration.SubmissionLogService"/>
+            <Class name="in.gov.fci.payroll.eseva.orchestration.SupportPreviewService"/>
+            <Class name="in.gov.fci.payroll.cpf.orchestration.VpfChangeService"/>
+            <Class name="in.gov.fci.payroll.employee.orchestration.LabourPersonWriter"/>
+            <Class name="in.gov.fci.payroll.eseva.orchestration.DocumentMails"/>
+        </Or>
+    </Match>
+    <!-- HttpServletRequest.changeSessionId() is called for its side effect (session fixation
+         defence); the new id it returns is not needed. -->
+    <Match>
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+        <Or>
+            <Class name="in.gov.fci.payroll.iam.security.WebSessions"/>
+            <Class name="in.gov.fci.payroll.iam.web.MeController"/>
+        </Or>
+    </Match>
+    <!-- Compares a job-parameter hash (a duplicate-run key), not a secret: timing reveals nothing. -->
+    <Match>
+        <Bug pattern="UNSAFE_HASH_EQUALS"/>
+        <Class name="in.gov.fci.payroll.jobs.batch.launch.JobLaunchService"/>
+    </Match>
+    <!-- Flyway Java migration: DDL cannot take bind parameters. Table and column names are constants
+         of the class; constraint names come from the database dictionary and are quoted. No user input. -->
+    <Match>
+        <Bug pattern="SQL_INJECTION_JDBC"/>
+        <Class name="in.gov.fci.payroll.platform.persistence.V022__Align_pay_pattern_with_target_ddl"/>
+    </Match>
+    <!-- Flyway Java migration (Spring Batch 6 job repository): CREATE SEQUENCE ... START WITH cannot take a
+         bind parameter. The only value concatenated is a long read from the database (MAX(id) + 1). -->
+    <Match>
+        <Bug pattern="SQL_INJECTION_JDBC"/>
+        <Class name="in.gov.fci.payroll.platform.persistence.V029_1__Spring_batch_6_job_instance_sequence"/>
+    </Match>
+    <!-- GeneratedKeys.insert (Oracle review F2) prepares the INSERT its caller passes: every caller passes a
+         constant statement text with ? placeholders, and every value is bound by ArgumentPreparedStatementSetter,
+         as JdbcTemplate.update(sql, args) does. No value is concatenated into the SQL. -->
+    <Match>
+        <Bug pattern="SQL_INJECTION_JDBC"/>
+        <Class name="in.gov.fci.payroll.platform.persistence.GeneratedKeys$Insert"/>
+    </Match>
+    <!-- Patterns are compiled in the static initialiser, so the match is on it; the remaining flag is
+         MOBILE: a single optional prefix before fixed-length digit groups; FindSecBugs flags it
+         heuristically. Proven linear on 100 kB adversarial input by
+         SensitiveDataMaskerTest.adversarialInputIsMaskedInLinearTime (digits, mixed). The two patterns
+         that really were super-linear (SECRET_KEY_VALUE, EMAIL) were rewritten instead. -->
+    <Match>
+        <Bug pattern="REDOS"/>
+        <Class name="in.gov.fci.payroll.platform.logging.SensitiveDataMasker"/>
+        <Method name="&lt;clinit&gt;"/>
+    </Match>
+    <!-- The ClamAV daemon protocol (INSTREAM) is plain TCP; clamd offers no TLS. Mitigation: clamd runs on the
+         application host or a private segment (fci.documents.clamd-host, default 127.0.0.1); the stream carries
+         a file the same request already received over TLS through NGINX. -->
+    <Match>
+        <Bug pattern="UNENCRYPTED_SOCKET"/>
+        <Class name="in.gov.fci.payroll.document.config.ClamdMalwareScanner"/>
+    </Match>
+    <!-- Reviewed 2026-11-09 (E5, coordinator request; all present at HEAD e478f619): the SQL text is built only from
+         compile-time constants of the class, enum constants or an int pay code, and every value is a bind parameter.
+         FindSecBugs flags any concatenation into a local variable. Narrowed to the methods that do it. -->
+    <Match>
+        <Bug pattern="SQL_INJECTION_SPRING_JDBC"/>
+        <Or>
+            <!-- Master.summary / Master.records: SQL constants of the enum, picked by a catalogue code -->
+            <And>
+                <Class name="in.gov.fci.payroll.configuration.orchestration.AccountingMasterService"/>
+                <Or><Method name="list"/><Method name="records"/><Method name="count"/></Or>
+            </And>
+            <!-- every caller of held passes a constant statement -->
+            <And>
+                <Class name="in.gov.fci.payroll.configuration.orchestration.RuleReadThroughService"/>
+                <Method name="held"/>
+            </And>
+            <!-- IN (?, ?, ...): only the number of placeholders varies, the ids are bound -->
+            <And>
+                <Class name="in.gov.fci.payroll.configuration.persistence.RateVersionFacts"/>
+                <Or><Method name="computedOn"/><Method name="dearnessArrears"/></Or>
+            </And>
+            <!-- the drawn filter: a constant WHERE with (? IS NULL OR ...) binds -->
+            <And>
+                <Class name="in.gov.fci.payroll.integration.orchestration.MonitorService"/>
+                <Method name="interfaces"/>
+            </And>
+            <And>
+                <Class name="in.gov.fci.payroll.labour.orchestration.LabourScreenService"/>
+                <Method name="sorRates"/>
+            </And>
+            <!-- constant fragments and amount(int payCode) of PayRules constants -->
+            <And>
+                <Class name="in.gov.fci.payroll.payroll.orchestration.ComputationResults"/>
+                <Or><Method name="pliPayments"/><Method name="rows"/></Or>
+            </And>
+            <!-- committed is one of the class constants ACTUAL / LOCKED (private method) -->
+            <And>
+                <Class name="in.gov.fci.payroll.payroll.orchestration.PayslipService"/>
+                <Method name="read"/>
+            </And>
+        </Or>
+    </Match>
+</FindBugsFilter>

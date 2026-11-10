@@ -1,0 +1,21 @@
+# Local run of the ONE WAR as TWO processes, exactly like the Tomcat deployment (online + batch on one
+# shared database), but started from Gradle or the IDE with the embedded Tomcat so that both can be
+# debugged:   ./gradlew :backend:h2Server   then   :backend:bootRunOnline   then   :backend:bootRunBatch
+# Profiles: local,demo,shared-h2,<online|batch>. Loaded only with this profile.
+#
+# Both processes must share the database AND the keys (OTP and audit HMAC, field encryption): the
+# local profile's per-process ephemeral keys would make each instance unable to read the other's
+# data. The keys come from a configtree generated once by scripts/GenerateSecrets.java into
+# backend/build/local (git-ignored; Gradle task localSecrets), passed as -Dfci.local.secrets-dir.
+spring:
+  config:
+    import:
+      - optional:configtree:${fci.local.secrets-dir:../backend/build/local/secrets/backend}/
+  datasource:
+    # The standalone H2 TCP server (:backend:h2Server, loopback only). In-memory: every restart of the
+    # H2 server starts from an empty schema, which the online instance migrates (Flyway).
+    url: jdbc:h2:tcp://127.0.0.1:${fci.local.h2-port:9092}/mem:fcilekha;MODE=Oracle;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
+fci:
+  api:
+    secrets:
+      ephemeral-keys: false

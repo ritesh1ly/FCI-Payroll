@@ -1,0 +1,54 @@
+{
+  // Local run of the ONE backend WAR as two processes (online + batch) on one shared H2 server, plus
+  // the Next.js dev server. Used by the debug configurations in launch.json; also runnable alone
+  // (Terminal > Run Task). Same Gradle tasks as the CLI: see README "Local run and debug".
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "fci: h2 server",
+      "detail": "Shared H2 TCP server, tcp://127.0.0.1:9092 (in-memory, loopback only)",
+      "type": "shell",
+      "command": "./gradlew",
+      "windows": { "command": ".\\gradlew.bat" },
+      "args": [":backend:h2Server", "--console=plain"],
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "fci-h2",
+        "pattern": { "regexp": "^__never__$" },
+        "background": { "activatesOnStart": true, "beginsPattern": "h2Server", "endsPattern": "TCP server running" }
+      },
+      "presentation": { "panel": "dedicated", "group": "fci" }
+    },
+    {
+      "label": "fci: backend online",
+      "detail": "Profiles local,demo,shared-h2,online on http://127.0.0.1:8180/api, JDWP 5005",
+      "type": "shell",
+      "command": "./gradlew",
+      "windows": { "command": ".\\gradlew.bat" },
+      "args": [":backend:bootRunOnline", "-Pdebug", "--console=plain"],
+      "dependsOn": "fci: h2 server",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "fci-online",
+        "pattern": { "regexp": "^__never__$" },
+        "background": { "activatesOnStart": true, "beginsPattern": "bootRunOnline", "endsPattern": "Listening for transport dt_socket at address: 5005" }
+      },
+      "presentation": { "panel": "dedicated", "group": "fci" }
+    },
+    {
+      "label": "fci: backend batch",
+      "detail": "Profiles local,demo,shared-h2,batch on http://127.0.0.1:8190/api, JDWP 5006 (waits for online)",
+      "type": "shell",
+      "command": "./gradlew",
+      "windows": { "command": ".\\gradlew.bat" },
+      "args": [":backend:bootRunBatch", "-Pdebug", "--console=plain"],
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "fci-batch",
+        "pattern": { "regexp": "^__never__$" },
+        "background": { "activatesOnStart": true, "beginsPattern": "bootRunBatch", "endsPattern": "Listening for transport dt_socket at address: 5006" }
+      },
+      "presentation": { "panel": "dedicated", "group": "fci" }
+    }
+  ]
+}

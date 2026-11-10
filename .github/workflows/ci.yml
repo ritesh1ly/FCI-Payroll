@@ -1,0 +1,185 @@
+# Quality gate (docs/quality/QUALITY_GATES.md). OD-155 (owner 2026-11-09, replaces OD-122's manual-only): runs on
+# every push to feature/Oracle, every pull request into it, and by hand (Actions > ci > Run workflow); a newer push
+# cancels the run in progress. Any gate below its threshold fails the run:
+#   backend         ./gradlew :backend:staticCheck (Spotless, compile of every source set with -Werror, SpotBugs +
+#                   FindSecBugs SAST) -> SARIF to code scanning; Sonar when SONAR_TOKEN is set; then the release
+#                   WAR (no H2) as the artifact fci-payroll-backend
+#   backend-tests   unit, integration, batch and architecture suites and the JaCoCo gates (line 97 %, branch 95 %,
+#                   gradle.properties), on H2 as on a developer machine
+#   (PIT mutation is NOT run here: owner 2026-11-09, OD-161, free-tier Actions minutes. It is the manual workflow
+#    mutation.yml, jobs pit-modules / pit, beside frontend Stryker; run it from Actions > mutation > Run workflow.)
+#   frontend        npm run check (typecheck, ESLint incl. security plugin, Prettier, i18n parity, E2E trace tags,
+#                   Vitest with the coverage gates), npm audit of production dependencies, then the standalone SSR
+#                   server as the artifact fci-payroll-frontend
+#   trace           every requirement ID cited in code exists in the KB (scripts/trace_check.py)
+#   secrets         gitleaks over the full history (.gitleaks.toml)
+# Frontend Stryker and backend PIT are mutation.yml (manual for now, OD-156 / OD-161). The Playwright
+# suite needs a deployed stack and stays on the developer machine. The DEV environment takes the two artifacts of a
+# green run (OD-155: artifacts only, no deployment from CI). OWASP Dependency-Check: nightly.yml.
+# Artifact storage (owner 2026-11-09, the quota filled on the first runs): test / coverage / PIT reports are uploaded
+# only when a job fails and kept 3 days; the deployable WAR and web server are kept 5 days.
+# Third-party actions are pinned to major versions; pin to commit SHAs if the org policy asks for it.
+name: ci
+
+on:
+  push:
+    branches: [feature/Oracle]
+  pull_request:
+    branches: [feature/Oracle]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      actions: read # upload-sarif reads the workflow run (private repositories)
+      security-events: write # upload the SpotBugs SARIF
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Sonar new-code detection
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Format, compile (-Werror), SAST
+        run: ./gradlew :backend:staticCheck --continue
+      # Code scanning needs GitHub Advanced Security on a private repository: without it the upload is
+      # refused, which must not fail the build (the SARIF stays in the backend-reports artifact).
+      - name: SpotBugs / FindSecBugs findings to code scanning
+        if: always() && hashFiles('backend/build/reports/spotbugs/main.sarif') != ''
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: backend/build/reports/spotbugs/main.sarif
+          category: spotbugs
+      - name: SonarQube
+        if: env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != ''
+        run: ./gradlew sonar -Dsonar.host.url="$SONAR_HOST_URL"
+      - name: Reports
+        if: failure() # storage quota (owner 2026-11-09): reports only when a job fails
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-reports
+          path: backend/build/reports/
+          retention-days: 3
+      # Every green build also yields the deployable backend, the release WAR (no H2: servers run on
+      # Oracle; owner 2026-11-01), as a download from the run's Artifacts.
+      - name: Build the release WAR (no H2)
+        run: ./gradlew :backend:bootWar
+      - name: Backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fci-payroll-backend
+          path: |
+            backend/build/libs/fci-payroll.war
+          if-no-files-found: error
+          retention-days: 5
+
+  backend-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Unit, integration, batch and architecture suites with the JaCoCo gates
+        run: ./gradlew :backend:check :backend:batchTest :backend:jacocoTestCoverageVerification --continue
+      - name: Test and coverage reports
+        if: failure() # storage quota (owner 2026-11-09): reports only when a job fails
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: |
+            backend/build/reports/tests/
+            backend/build/reports/jacoco/
+          retention-days: 3
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      # Full check: the static gates plus Vitest with the coverage gates (vitest.config.ts thresholds).
+      - run: npm run check
+      - name: Known vulnerabilities in production dependencies
+        run: npm run audit:prod
+      # Every green build also yields the deployable frontend: the standalone SSR server, laid out
+      # as release-bundle.yml and scripts/local/deploy-local.ps1 deploy it (node server.js).
+      - name: Build the standalone SSR server
+        run: npm run build
+      - name: Assemble the server directory
+        run: |
+          rm -rf ../dist/web
+          mkdir -p ../dist/web/.next
+          cp -R .next/standalone/. ../dist/web/
+          cp -R .next/static ../dist/web/.next/static
+          if [ -d public ]; then cp -R public ../dist/web/public; fi
+          test -f ../dist/web/server.js
+          tar -czf ../dist/fci-payroll-web.tar.gz -C ../dist/web .
+      - name: Frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fci-payroll-frontend
+          path: dist/fci-payroll-web.tar.gz
+          if-no-files-found: error
+          retention-days: 5
+      - name: SonarQube
+        if: env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != ''
+        uses: SonarSource/sonarqube-scan-action@v4
+        with:
+          projectBaseDir: frontend
+
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/trace_check.py --report
+
+  secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read # on a pull request gitleaks lists its commits (403 without it, 2026-10-25)
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: .gitleaks.toml

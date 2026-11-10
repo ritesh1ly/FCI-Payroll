@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Shared Logback configuration for FCI web applications (ADR-0012). Include it from the
+  application's logback-spring.xml:
+
+      <configuration>
+          <include resource="in/gov/fci/payroll/platform/logging/fci-logback.xml"/>
+      </configuration>
+
+  Output (${FCI_LOG_NAME} = fci.logging.file-name: "api" with profile online, "batch" with profile
+  batch, "app" otherwise, so each instance's files say which one wrote them):
+    * ${FCI_LOG_DIR}/${FCI_LOG_NAME}.json                 application log, ECS JSON, masked
+    * ${FCI_LOG_DIR}/${FCI_LOG_NAME}-security-audit.json  SECURITY_AUDIT logger only, ECS JSON, masked
+    * console                             only with profile "local" (plain text, masked) or "console"
+                                          (ECS JSON, e.g. containers). On Tomcat the console is
+                                          catalina.out: writing every line there too would duplicate
+                                          the application log, so deployed instances log to the files only.
+  Rolling: daily and at 100 MB, gzip, 180 days (CERT-In), size cap from fci.logging.total-size-cap.
+  Masking of JSON output is applied by MaskingJsonMembersCustomizer (registered via spring.factories).
+-->
+<included>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <springProperty scope="context" name="FCI_APP" source="fci.common.app-name" defaultValue="app"/>
+    <springProperty scope="context" name="FCI_LOG_NAME" source="fci.logging.file-name" defaultValue="app"/>
+    <springProperty scope="context" name="FCI_LOG_DIR" source="fci.logging.dir"
+                    defaultValue="${catalina.base:-.}/logs/fci-${FCI_APP}"/>
+    <springProperty scope="context" name="FCI_LOG_MAX_HISTORY" source="fci.logging.max-history-days"
+                    defaultValue="180"/>
+    <springProperty scope="context" name="FCI_LOG_MAX_FILE_SIZE" source="fci.logging.max-file-size"
+                    defaultValue="100MB"/>
+    <springProperty scope="context" name="FCI_LOG_TOTAL_SIZE_CAP" source="fci.logging.total-size-cap"
+                    defaultValue="50GB"/>
+
+    <conversionRule conversionWord="maskedMsg" class="in.gov.fci.payroll.platform.logging.MaskingMessageConverter"/>
+
+    <appender name="FCI_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${FCI_LOG_DIR}/${FCI_LOG_NAME}.json</file>
+        <encoder class="org.springframework.boot.logging.logback.StructuredLogEncoder">
+            <format>ecs</format>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${FCI_LOG_DIR}/${FCI_LOG_NAME}.%d{yyyy-MM-dd}.%i.json.gz</fileNamePattern>
+            <maxFileSize>${FCI_LOG_MAX_FILE_SIZE}</maxFileSize>
+            <maxHistory>${FCI_LOG_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>${FCI_LOG_TOTAL_SIZE_CAP}</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="FCI_SECURITY_AUDIT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${FCI_LOG_DIR}/${FCI_LOG_NAME}-security-audit.json</file>
+        <encoder class="org.springframework.boot.logging.logback.StructuredLogEncoder">
+            <format>ecs</format>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${FCI_LOG_DIR}/${FCI_LOG_NAME}-security-audit.%d{yyyy-MM-dd}.%i.json.gz</fileNamePattern>
+            <maxFileSize>${FCI_LOG_MAX_FILE_SIZE}</maxFileSize>
+            <maxHistory>${FCI_LOG_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>${FCI_LOG_TOTAL_SIZE_CAP}</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <springProfile name="local">
+        <appender name="FCI_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %5p [%t] [%X{correlationId:-}] [%X{userId:-}] %-40.40logger{39} : %maskedMsg%n%wEx</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+    </springProfile>
+    <springProfile name="console &amp; !local">
+        <appender name="FCI_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="org.springframework.boot.logging.logback.StructuredLogEncoder">
+                <format>ecs</format>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+    </springProfile>
+
+    <!-- springProfile may not be nested inside root / logger (the appenders would be lost): one block
+         per case, each declaring the SECURITY_AUDIT logger and root completely. -->
+    <springProfile name="local | console">
+        <logger name="SECURITY_AUDIT" level="INFO" additivity="false">
+            <appender-ref ref="FCI_SECURITY_AUDIT_FILE"/>
+            <appender-ref ref="FCI_CONSOLE"/>
+        </logger>
+        <root level="INFO">
+            <appender-ref ref="FCI_FILE"/>
+            <appender-ref ref="FCI_CONSOLE"/>
+        </root>
+    </springProfile>
+    <springProfile name="!(local | console)">
+        <logger name="SECURITY_AUDIT" level="INFO" additivity="false">
+            <appender-ref ref="FCI_SECURITY_AUDIT_FILE"/>
+        </logger>
+        <root level="INFO">
+            <appender-ref ref="FCI_FILE"/>
+        </root>
+    </springProfile>
+</included>

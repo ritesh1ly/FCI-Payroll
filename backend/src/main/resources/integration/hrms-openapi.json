@@ -1,0 +1,5393 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "FCI HRMS API (as consumed by FCI Payroll)",
+    "version": "1.0.0",
+    "description": "Request contract of the HRMS APIs. Derived from FCI's Postman collection; owned and versioned here. Responses are the generic envelope (observed, to be confirmed by HRMS).",
+    "x-derived-from": {
+      "file": "FCI HRMS.postman_collection.json",
+      "collectionId": "5e59f6b4-5557-4c75-8a67-6418d64ca751",
+      "tool": "scripts/integration/derive_hrms_openapi.py"
+    }
+  },
+  "servers": [
+    {
+      "url": "{baseUrl}",
+      "variables": {
+        "baseUrl": {
+          "default": "http://localhost:8080"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "welcome",
+        "summary": "Welcome",
+        "tags": [
+          "HRMS"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cancel-advance-loan": {
+      "put": {
+        "operationId": "cancel_advance_loan",
+        "summary": "Cancel Loan Advance",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "transmast_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cancel-brief-case-reimbursement": {
+      "put": {
+        "operationId": "cancel_brief_case_reimbursement",
+        "summary": "Cancel Briefcase Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "reim_allow_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cancel-laptop-reimbursement": {
+      "put": {
+        "operationId": "cancel_laptop_reimbursement",
+        "summary": "Cancel Laptop Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "reim_allow_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cancel-leave-detail": {
+      "put": {
+        "operationId": "cancel_leave_detail",
+        "summary": "Cancel Leave Detail",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_leave_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cancel-leave-encash": {
+      "put": {
+        "operationId": "cancel_leave_encash",
+        "summary": "Cancel Leave Encashment",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "leave_encash_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cancel-local-travel-allowance": {
+      "put": {
+        "operationId": "cancel_local_travel_allowance",
+        "summary": "Cancel Local Travel Allowance",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "reim_allow_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cancel-ltc-encash": {
+      "put": {
+        "operationId": "cancel_ltc_encash",
+        "summary": "Cancel LTC Encashment",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "p_ltc_encash_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cancel-medical-claim": {
+      "put": {
+        "operationId": "cancel_medical_claim",
+        "summary": "Cancel Medical Claim",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "payment_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cancel-mobile-reimbursement": {
+      "put": {
+        "operationId": "cancel_mobile_reimbursement",
+        "summary": "Cancel Mobile Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "reim_allow_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cancel-newspaper-allowance": {
+      "put": {
+        "operationId": "cancel_newspaper_allowance",
+        "summary": "Cancel Newspaper Allowance",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "reim_allow_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cancel-ota": {
+      "put": {
+        "operationId": "cancel_ota",
+        "summary": "Cancel OTA Payment",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_ota_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cancel-pay-ltc-hometown": {
+      "put": {
+        "operationId": "cancel_pay_ltc_hometown",
+        "summary": "Cancel LTC Hometown",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "reim_allow_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cancel-pay-travel-allowance": {
+      "put": {
+        "operationId": "cancel_pay_travel_allowance",
+        "summary": "Cancel Pay Travel Allowance",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "reim_allow_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cancel-tele-data-reimbursement": {
+      "put": {
+        "operationId": "cancel_tele_data_reimbursement",
+        "summary": "Cancel Tele Data Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "reim_allow_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/cpf-generation": {
+      "get": {
+        "operationId": "cpf_generation",
+        "summary": "CPF Generation",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "emp_num",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/forecast-report": {
+      "get": {
+        "operationId": "forecast_report",
+        "summary": "Get Forcast Report",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "emp_num",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "p_ymm",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-advance-loan-hdr-status": {
+      "get": {
+        "operationId": "get_advance_loan_hdr_status",
+        "summary": "Loan Advance HDR Status",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "transmast_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-basic-syncup-status": {
+      "get": {
+        "operationId": "get_basic_syncup_status",
+        "summary": "Get Basic Syuncup Status",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "hist_flag",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "emp_num",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-leave-encashment-status": {
+      "get": {
+        "operationId": "get_leave_encashment_status",
+        "summary": "Get Leave Encashment Status",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "leave_encash_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-loan-status": {
+      "get": {
+        "operationId": "get_loan_status",
+        "summary": "Loan Status",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "emp_num",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "transmast_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-ltc-encash-status": {
+      "get": {
+        "operationId": "get_ltc_encash_status",
+        "summary": "LTC Encash Status",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "p_ltc_encash_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-medical-claim-status": {
+      "get": {
+        "operationId": "get_medical_claim_status",
+        "summary": "Get Medical Claim Status",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "emp_num",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "payment_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-ota-status": {
+      "get": {
+        "operationId": "get_ota_status",
+        "summary": "Get OTA Status",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "emp_ota_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-payroll-statust": {
+      "get": {
+        "operationId": "get_payroll_statust",
+        "summary": "Payroll Status",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "emp_num",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-pension-slip": {
+      "get": {
+        "operationId": "get_pension_slip",
+        "summary": "Get Pension Slip",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "emp_num",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "p_from_year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "p_to_year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-request-brief-case-reimbursement": {
+      "get": {
+        "operationId": "get_request_brief_case_reimbursement",
+        "summary": "Get Briefcase Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reim_allow_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-request-laptop-buyback": {
+      "get": {
+        "operationId": "get_request_laptop_buyback",
+        "summary": "Get Laptop Buyback",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reim_allow_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-request-laptop-reimbursement": {
+      "get": {
+        "operationId": "get_request_laptop_reimbursement",
+        "summary": "Get Laptop Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reim_allow_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-request-local-travel-allowance": {
+      "get": {
+        "operationId": "get_request_local_travel_allowance",
+        "summary": "Get Request Local Travel Allowance",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reim_allow_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-request-mobile-reimbursement": {
+      "get": {
+        "operationId": "get_request_mobile_reimbursement",
+        "summary": "Get Mobile Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reim_allow_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-request-newspaper-allowance": {
+      "get": {
+        "operationId": "get_request_newspaper_allowance",
+        "summary": "Get Newspaper Allowance",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reim_allow_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-request-pay-liveries-reimbursement": {
+      "get": {
+        "operationId": "get_request_pay_liveries_reimbursement",
+        "summary": "Get Pay Liveries Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reim_allow_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-request-pay-ltc-hometown": {
+      "get": {
+        "operationId": "get_request_pay_ltc_hometown",
+        "summary": "Get LTC Hometown",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reim_allow_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-request-pay-travel-allowance": {
+      "get": {
+        "operationId": "get_request_pay_travel_allowance",
+        "summary": "Get Request Pay Travel Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reim_allow_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/get-request-tele-data-reimbursement": {
+      "get": {
+        "operationId": "get_request_tele_data_reimbursement",
+        "summary": "Get Tele Data Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reim_allow_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/getCpfSlip": {
+      "get": {
+        "operationId": "getcpfslip",
+        "summary": "Get CPF Slip",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "emp_num",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from_year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to_year",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/getPayslip": {
+      "get": {
+        "operationId": "getpayslip",
+        "summary": "Get Payslip",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "emp_num",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "yymm",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/getSalaryControlRegister": {
+      "get": {
+        "operationId": "getsalarycontrolregister",
+        "summary": "Get Salary Control Register",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "emp_num",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from_yymm",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to_yymm",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/post-cafeteria-allowance": {
+      "post": {
+        "operationId": "post_cafeteria_allowance",
+        "summary": "Cafeteria Allowance",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "emp_num",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "request_id": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    },
+                    "srl_num": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "emp_num": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    },
+                    "pay_code": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    },
+                    "percent": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    },
+                    "adj_pay_code": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "adj_pay_perc": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "adj_perc": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "fin_year": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    },
+                    "paymode_flag": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    },
+                    "effective_dt": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "vehical_flag": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    },
+                    "attribute1": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-advance-loan-hdr": {
+      "post": {
+        "operationId": "request_advance_loan_hdr",
+        "summary": "Loan Advance HDR",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "loan_type": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanction_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "loan_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "recovery_start_yymm": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "installment_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "first_installment_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "principal_installment": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "interest_installment": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "interest_installment_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "total_installment": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "attribute1": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute2": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute3": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute4": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute5": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute6": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute7": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute8": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute9": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute10": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute11": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute12": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute13": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute14": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute15": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-brief-case-reimbursement": {
+      "post": {
+        "operationId": "request_brief_case_reimbursement",
+        "summary": "Request Briefcase Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanction_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_date": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-direct-payroll": {
+      "post": {
+        "operationId": "request_direct_payroll",
+        "summary": "Maintain Direct Payroll",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "emp_num",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "request_id": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "emp_no": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "pay_code": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "pay_mode": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "amt": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "valid_from": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "inst_amt": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "no_of_inst": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "bal_amt": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "saving_no": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "agency_code": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "txn_categ": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "agency_site_code": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "user_id": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "site_id": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "attribute1": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "attribute2": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "attribute3": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "attribute4": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "attribute5": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "attribute6": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "attribute7": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "attribute8": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "attribute9": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    },
+                    "attribute10": {
+                      "nullable": true,
+                      "description": "the sample is empty: the kind of value is not known"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "x-note": "the Postman sample is not valid JSON; its empty values were read as null",
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-laptop-buyback": {
+      "post": {
+        "operationId": "request_laptop_buyback",
+        "summary": "Request Laptop Buyback",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanction_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanc_req_for": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-laptop-reimbursement": {
+      "post": {
+        "operationId": "request_laptop_reimbursement",
+        "summary": "Request Laptop Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanction_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanc_req_for": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-lease-accomodation": {
+      "post": {
+        "operationId": "request_lease_accomodation",
+        "summary": "Lease Accomodation",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "accom_type": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "lic_fee_dem": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "lease_amt": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "lease_perc": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "eff_strt_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "eff_end_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "attribute1": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute2": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute3": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute4": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute5": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute6": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute7": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute8": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute9": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute10": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute11": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute12": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute13": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute14": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute15": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-leave-encashment": {
+      "post": {
+        "operationId": "request_leave_encashment",
+        "summary": "Leave Encashment",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "application_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanction_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanctioned_el": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanctioned_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "attribute1": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute2": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute3": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute4": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute5": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute6": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute7": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute8": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute9": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute10": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute11": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute12": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute13": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute14": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute15": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute16": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute17": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute18": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute19": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute20": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-loan-fore-closure": {
+      "post": {
+        "operationId": "request_loan_fore_closure",
+        "summary": "Loan Foreclosure",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "loan_type": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "principle_os": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "interst_os": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "receipt_no": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "trans_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "loan_flag": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "interst_amt": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "recipt_amt": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "attribute1": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute2": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute3": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute4": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute5": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute6": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute7": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute8": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute9": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute10": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute11": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute12": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute13": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute14": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute15": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-loan-reschedule": {
+      "post": {
+        "operationId": "request_loan_reschedule",
+        "summary": "Loan Reschedule",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "trans_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "loan_type": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "principle_os": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "interst_os": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bal_prn_instl": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bal_int_instl": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "new_prn_instlno": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "new_int_instlno": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "new_prn_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "new_int_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "advance_type": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "attribute1": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute2": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute3": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute4": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute5": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute6": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute7": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute8": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute9": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute10": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute11": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute12": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute13": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute14": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute15": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-local-travel-allowance": {
+      "post": {
+        "operationId": "request_local_travel_allowance",
+        "summary": "Request Local Travel Allowance",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanction_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "travel_mode": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "travel_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "travel_from": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "travel_to": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "distance": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-ltc-encash": {
+      "post": {
+        "operationId": "request_ltc_encash",
+        "summary": "LTC Encash",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "ltc_type": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "block_yr": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "encsh_amt": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "it_ded": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "othr_ded": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "net_amt": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "pay_mode": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "rmrks": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "application_dt": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanction_dt": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "attribute1": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute2": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute3": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute4": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute5": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute6": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute7": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute8": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute9": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute10": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute11": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute12": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute13": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute14": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute15": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-medical-claim": {
+      "post": {
+        "operationId": "request_medical_claim",
+        "summary": "Medical Claim",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_agnst": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "paycode": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_dt": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "file_dt": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "remark": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "it_ded": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "netamt": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "from_dt": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "to_dt": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "qtr": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "finyear": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "attribute1": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute2": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute3": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute4": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute5": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute6": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute7": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute8": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute9": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute10": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute11": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute12": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute13": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute14": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute15": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-mobile-reimbursement": {
+      "post": {
+        "operationId": "request_mobile_reimbursement",
+        "summary": "Request Mobile Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanction_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanc_req_for": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-newspaper-allowance": {
+      "post": {
+        "operationId": "request_newspaper_allowance",
+        "summary": "Request Newspaper Allowance",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanction_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "from_yymm": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "to_yymm": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "newspaper_name": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-ota": {
+      "post": {
+        "operationId": "request_ota",
+        "summary": "OTA",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "gross_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "it_ded": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "othr_ded": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "net_amt": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "pay_mode": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "remarks": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "ciel_flag": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "ota_yymm": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "otahrs": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "otarate": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "attribute1": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute2": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute3": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute4": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute5": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute6": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute7": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute8": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute9": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute10": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute11": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute12": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute13": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute14": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  },
+                  "attribute15": {
+                    "nullable": true,
+                    "description": "the sample is empty: the kind of value is not known"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-pay-liveries-reimbursement": {
+      "post": {
+        "operationId": "request_pay_liveries_reimbursement",
+        "summary": "Pay Liveries Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanction_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanc_req_for": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-pay-ltc-hometown": {
+      "post": {
+        "operationId": "request_pay_ltc_hometown",
+        "summary": "Request LTC Hometown",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanction_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-pay-travel-allowance": {
+      "post": {
+        "operationId": "request_pay_travel_allowance",
+        "summary": "Request Pay Travel Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanction_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "from_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "to_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "reim_reason": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/request-tele-data-reimbursement": {
+      "post": {
+        "operationId": "request_tele_data_reimbursement",
+        "summary": "Request Tele Data Reimbursement",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "request_id": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "emp_num": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sanction_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "sanction_amount": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_number": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "bill_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "from_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "to_date": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/token": {
+      "post": {
+        "operationId": "token",
+        "summary": "Generate Token",
+        "tags": [
+          "HRMS"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  },
+                  "password": {
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "a number or text: one sample cannot tell which"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    },
+    "/updating-hra-da": {
+      "post": {
+        "operationId": "updating_hra_da",
+        "summary": "Updating HRA and DA",
+        "tags": [
+          "HRMS"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "emp_num",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "request_for",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "request_id": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    },
+                    "request_for": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    },
+                    "pay_revision_flag": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    },
+                    "effective_date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "pay_scale_type": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    },
+                    "min_basic": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    },
+                    "max_basic": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    },
+                    "hra_city_type": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    },
+                    "hra_rate": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ],
+                      "description": "a number or text: one sample cannot tell which"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "$ref": "#/components/responses/Success"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Refused"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Failure"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "api-key"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "responses": {
+      "Success": {
+        "description": "2xx",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "x-source": "observed on the FCI mock server; the collection has no saved response",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "description": "success or error"
+                },
+                "status_code": {
+                  "type": "integer"
+                },
+                "error_code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "nullable": true
+                },
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "timestamp": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Refused": {
+        "description": "4xx: refused (error_code, message, errors[])",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "x-source": "observed on the FCI mock server; the collection has no saved response",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "description": "success or error"
+                },
+                "status_code": {
+                  "type": "integer"
+                },
+                "error_code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "nullable": true
+                },
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "timestamp": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Failure": {
+        "description": "5xx: the call may be repeated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "x-source": "observed on the FCI mock server; the collection has no saved response",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "description": "success or error"
+                },
+                "status_code": {
+                  "type": "integer"
+                },
+                "error_code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "nullable": true
+                },
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "timestamp": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

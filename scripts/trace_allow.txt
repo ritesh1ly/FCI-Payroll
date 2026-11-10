@@ -1,0 +1,9 @@
+# IDs that are not in the SRS v0.5 / KB registers but are knowingly kept, one "ID path" per line with
+# the reason. Only for text that must not change (applied Flyway migrations: editing them changes the
+# checksum). Never for new code: cite the current ID instead.
+#
+# SRS v0.3 IDs (superseded) in comments of the applied V003 migration:
+SRS-19-9 db/migration/h2/V003__s05_governance.sql     # v0.3; v0.5: module approval-authority table (rule engine HQ only)
+SRS-19-9 db/migration/oracle/V003__s05_governance.sql # same
+SRS-Q-11 db/migration/h2/V003__s05_governance.sql     # v0.3 open item, closed in v0.3 (legacy audit migrated, BR-AUDIT-008)
+SRS-Q-11 db/migration/oracle/V003__s05_governance.sql # same

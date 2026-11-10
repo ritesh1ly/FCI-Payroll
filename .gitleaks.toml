@@ -1,0 +1,25 @@
+# Secret scanning (gitleaks, run in CI on the full history: .github/workflows/ci.yml).
+# Default rules plus a narrow allowlist for values that are public by design.
+title = "FCILekha Payroll secret scan"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public-by-design test values only. Never add a real credential here."
+# The shared password of the demo seed users (docs/rbac/SEED_USERS.md): profile demo only, refused
+# together with prod by StartupGuards; and the IT-only metrics credential (application-it.yaml).
+regexes = [
+  '''Fci@Demo2026''',
+  '''Metrics#It-Only-2026''',
+  # PBKDF2 hash of that IT-only metrics password (fixed, public test salt 0011..eeff).
+  '''\{pbkdf2@SpringSecurity_v5_8\}00112233445566778899aabbccddeeff[0-9a-f]+''',
+  # Rule-engine rule keys (rule_definition.rule_key, e.g. LWF.348.APPLICABILITY, TAX.SLAB.OLD):
+  # dotted upper-case words, matched by generic-api-key as "key: '...'" in fixtures (2026-10-25).
+  # A credential is never dotted upper-case words only.
+  '''^[A-Z][A-Z0-9_]*(\.[A-Z0-9_]+)+$''',
+]
+paths = [
+  '''docs/requirements/''',
+  '''(^|/)package-lock\.json$''',
+]

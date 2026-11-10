@@ -1,0 +1,736 @@
+# FCILekha Payroll backend: base configuration with secure (prod-like) defaults. Profiles relax only
+# what they must. Secrets are never set here: they come from environment variables or a configtree
+# mount (ADR-0013). Deployed WARs also read config/app/<mode>/application.yaml (context descriptor).
+#
+# ONE WAR, TWO MODES. Exactly one of these profiles is active (StartupGuards refuses anything else):
+#   online : REST controllers, session login, browser APIs. No scheduler, no poller, no jobs.
+#   batch  : job-queue poller, Spring Batch jobs, scheduled jobs. No REST API (actuator only).
+# Shared by both: domain services, rule engine, data access, caches.
+
+spring:
+  application:
+    name: fci-payroll
+  # Uploads (order copies, X-07 files) up to fci.documents.max-file-bytes; one file per request.
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
+  config:
+    import:
+      - optional:configtree:/run/secrets/fci-payroll/
+  main:
+    banner-mode: off
+  threads:
+    virtual:
+      # JDK 25: request threads are virtual in Tomcat 11 (server.xml); Spring's own executors stay
+      # bounded platform pools on purpose (exports, jobs, schedules: ADR-0024, BATCH_DESIGN).
+      enabled: false
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+  datasource:
+    # Interim store (ADR-0019). Local single-process runs use an in-memory database; deployed online
+    # and batch instances share one H2 TCP server (config/app). Replaced by Oracle at cut-over.
+    url: jdbc:h2:mem:fcilekha;MODE=Oracle;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
+    username: fci_payroll
+    password: ${FCI_DB_PASSWORD:}
+    hikari:
+      pool-name: fci-payroll
+      maximum-pool-size: 20
+      minimum-idle: 2
+      connection-timeout: 3000
+      validation-timeout: 2000
+      max-lifetime: 1800000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        # Interim H2 (Oracle mode) only; removed at the Oracle cut-over (OracleDialect is detected).
+        dialect: in.gov.fci.payroll.platform.persistence.h2.OracleModeH2Dialect
+        jdbc:
+          time_zone: UTC
+          batch_size: 50
+        timezone:
+          default_storage: NORMALIZE_UTC
+        type:
+          preferred_boolean_jdbc_type: SMALLINT
+          # The target DDL uses TIMESTAMP (no time zone) and stores UTC.
+          preferred_instant_jdbc_type: TIMESTAMP
+        query:
+          fail_on_pagination_over_collection_fetch: true
+          # Oracle review F25: a JPQL IN list is padded to the next power of two (1, 2, 4, 8 ...),
+          # so lists of different lengths share a few statement texts (Oracle's shared pool and the
+          # driver's statement cache) instead of one text per length.
+          in_clause_parameter_padding: true
+  flyway:
+    # db/migration/<vendor> (oracle | h2), then vendor-neutral reference data (V006). The scripts are
+    # the repository's db/ folder, packaged into the WAR by the build. Rollbacks: db/rollback/.
+    locations: classpath:db/migration/{vendor},classpath:db/migration/common
+    validate-on-migrate: true
+    clean-disabled: true
+    # OD-141 / OD-142 (owner 2026-11-09): the demo-evaluation seeds of db/seed (V082_20 .. V082_39: the
+    # locked demo months of DH001 / CH001, the test office of the cycle specs, the demo statutory rates)
+    # apply only where this is 'Y': the demo profile below. 'N' everywhere else, so the integration
+    # suites (application-it.yaml), the edge and volume data sets (which write the same offices and
+    # months) and any run without db/seed see none of them. No effect outside db/seed.
+    placeholders:
+      "[demo_evaluation]": 'N'
+  session:
+    # Spring Session JDBC (online only; batch excludes it). Tables are created by Flyway (V010).
+    timeout: 15m
+    jdbc:
+      initialize-schema: never
+      table-name: SPRING_SESSION
+      # "-" disables Spring Session's own cleanup task: the online instance runs NO scheduled task.
+      # Expired sessions are purged by the batch instance's HousekeepingJob.
+      cleanup-cron: "-"
+  batch:
+    job:
+      # Spring Batch jobs never auto-run at start-up, in either mode: only a claimed queue row
+      # starts one (JobQueuePoller, batch profile).
+      enabled: false
+    jdbc:
+      # Job repository tables are created by Flyway (V011).
+      initialize-schema: never
+  h2:
+    console:
+      enabled: false
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+  mvc:
+    problemdetails:
+      enabled: false
+  web:
+    error:
+      include-stacktrace: never
+      include-message: never
+      include-binding-errors: never
+      include-exception: false
+
+server:
+  # Applies to local runs (embedded Tomcat); the external Tomcat sets the context and connectors.
+  servlet:
+    context-path: /api
+    session:
+      timeout: 15m
+      # The session id travels only in the cookie, never in a URL (OWASP ASVS V3.1.1).
+      tracking-modes: cookie
+  port: 8080
+  shutdown: graceful
+  error:
+    whitelabel:
+      enabled: false
+    include-stacktrace: never
+    include-message: never
+  tomcat:
+    max-http-form-post-size: 1MB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,scheduledtasks
+  health:
+    # An SMTP outage delays reset and activation e-mails but must not mark the service DOWN.
+    mail:
+      enabled: false
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState,db
+        liveness:
+          include: livenessState
+  info:
+    env:
+      enabled: false
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+logging:
+  structured:
+    format:
+      console: ecs
+  level:
+    # Hibernate warns once per mapped type that the JDBC type preferences above are "incubating"
+    # settings (238 identical lines per start); they are deliberate (Oracle / H2 Oracle mode).
+    org.hibernate.orm.incubating: ERROR
+
+fci:
+  # OD-130 (owner 2026-11-07; FCI security to verify, not in the SRS). A signed-in user's API call refused
+  # for lack of right or office scope. Each key is overridable per profile and by environment variable
+  # (FCI_SECURITY_OFFENCE_ENABLED, FCI_SECURITY_OFFENCE_LOGOUTONOFFENCE, FCI_SECURITY_OFFENCE_SUSPENDAFTER).
+  # security_event and the critical log entry are always written: no key turns them off.
+  security:
+    offence:
+      # Master switch, 'Y' or 'N'. 'N': refused calls are recorded only, nobody is signed out or suspended,
+      # nothing is counted. Allowed everywhere; outside development each start then writes the critical
+      # entry event=SECURITY_OFFENCE_DISABLED so an alert can catch it.
+      enabled: 'Y'
+      # 'Y' or 'N': an offence ends the user's sessions (the next call answers 401 AUTH-401-OFFENCE).
+      logout-on-offence: 'Y'
+      # Offences since the last reinstatement that suspend the account (user_status SUSPENDED, reinstated
+      # only by an Administrator on A-01). 0 never suspends. The last active System Administrator is never
+      # suspended. Owner's value 3.
+      suspend-after: 3
+  # Masking of personal data in logs (R-PII), shared by every module that logs a request or a response, as
+  # configuration and not as code: add a line for a new sensitive field, no release needed. A JSON key or a
+  # query parameter name is matched by regular expression against the WHOLE name, case ignored, the first
+  # matching rule wins. Strategies: FULL, KEEP_LAST, KEEP_FIRST (keep: n), EMAIL, INITIALS, HASH. With no
+  # rule at all a log withholds bodies: it never writes an unmasked body because nobody set a policy.
+  logging:
+    masking:
+      fields:
+        - {name: ".*(password|passwd|passphrase|secret|token|api[_-]?key|authorization|otp|pin|cvv).*", strategy: FULL}
+        - {name: ".*(dob|birth_?date|date_of_birth).*", strategy: FULL}
+        - {name: ".*(pan|pan_?no|pan_?number)", strategy: KEEP_LAST, keep: 4}
+        - {name: ".*(aadhaar|aadhar|uid)(_?(no|number))?", strategy: KEEP_LAST, keep: 4}
+        - {name: ".*(bank_?account|account_?(no|number)|acct).*", strategy: KEEP_LAST, keep: 4}
+        - {name: ".*cpf.*(account|code|no|number).*", strategy: KEEP_LAST, keep: 4}
+        - {name: ".*(mobile|phone|contact_?no).*", strategy: KEEP_LAST, keep: 3}
+        - {name: ".*e_?mail.*", strategy: EMAIL}
+        - {name: "(emp_?name|first_?name|last_?name|full_?name|name)", strategy: INITIALS}
+      # Free text anywhere in a body or value, applied in order.
+      patterns:
+        - {regex: "[A-Z]{5}[0-9]{4}[A-Z]", strategy: KEEP_LAST, keep: 4}
+        - {regex: "(?<![0-9])[0-9]{12}(?![0-9])", strategy: KEEP_LAST, keep: 4}
+        - {regex: "(?<![0-9])[6-9][0-9]{9}(?![0-9])", strategy: KEEP_LAST, keep: 3}
+        - {regex: '[A-Za-z0-9._%+-]{1,64}@[A-Za-z0-9-]{1,63}(\.[A-Za-z0-9-]{1,63}){1,8}', strategy: EMAIL}
+  integration:
+    hrms:
+      # Telemetry of Payroll's calls to HRMS (logger FCI_HRMS_EXCHANGE, metrics fci.hrms.client.*): one event per
+      # attempt with the API, status and duration. `bodies` is the master switch for request and response bodies
+      # (false = none at all); each API can narrow it with api.<code>.call.log-request / log-response, and
+      # mask-data (Y/N, default Y; N is honoured only on dev, local and demo). The token call never logs a body.
+      log:
+        bodies: true
+        max-body-chars: 1500
+      # Defaults for every API's call policy (timeouts in ms, flags Y/N, connection pool); each API can override
+      # them under api.<code>.call. Absent values fall back to the interface's time limit and the shared pool.
+      # defaults:
+      #   connect-timeout-ms: 2000
+      #   read-timeout-ms: 8000
+      #   timeout-ms: 10000
+      #   mask-data: Y
+      #   log-request: Y
+      #   log-response: Y
+      #   pool: {max-connections: 50, pending-acquire-max-count: 100, pending-acquire-timeout-ms: 5000,
+      #          max-idle-seconds: 30, max-life-seconds: 300, evict-interval-seconds: 30, leasing: FIFO}
+
+  common:
+    app-name: payroll
+    management-port: 8081
+  # Master-data caches (Caffeine, per instance). An approved change reaches every online and batch
+  # instance within check-interval (one small query of cache_region, only while caches are read);
+  # max-age is the periodic full reload. docs/architecture/CACHING.md.
+  cache:
+    check-interval: 10s
+    max-age: 15m
+  api:
+    # OTP codes one user may be issued for one action in an hour (OD-131). Set per environment here,
+    # by profile, or with FCI_API_OTP_MAX_PER_HOUR (1 to 500). The demo profile uses 500.
+    otp:
+      max-per-hour: ${FCI_API_OTP_MAX_PER_HOUR:5}
+    single-session: true
+    notification:
+      mode: smtp
+      from: no-reply@fci.gov.in
+    # The e-mailed payslip (after the month-end lock, SRS-17-1) and Form 16 (on release, OD-148,
+    # PENDING F16-5), sent by the batch instance's housekeeping run. Retries and back-off are the
+    # MEMBER_EMAIL interface settings on X-03 (R-INT, PENDING MAIL-2), not values here.
+    document-mail:
+      enabled: true
+      batch: 200                 # e-mails read per housekeeping run (ids only: memory stays bounded)
+      parallelism: 2             # senders per batch instance, each on a leased connection slot
+      held-recheck: PT24H        # a payslip whose payment is held is checked again after this
+      not-ready-recheck: PT15M   # a PDF the batch has not stored yet is looked for again after this
+      # The mail server's capacity (rate per minute / hour / day, connections, claim lease,
+      # attachment cap, retry jitter, pause after rejected credentials) is FCI IT's: table
+      # mail_channel_config (PENDING MAIL-4), unseeded; without it nothing is sent.
+      # PENDING MAIL-1 (FCI to decide): the PDF attached (true) or only a notice to download it in
+      # eSeva (false); password protection off until FCI decides. When on, the rule is required
+      # (nothing is sent unprotected without it): tokens {pan}, {pan:N} (first N characters),
+      # {dob:PATTERN} (e.g. {dob:ddMMyyyy}), {eis}, with plain text between them.
+      attachment: true
+      password:
+        enabled: false
+        rule: ${FCI_DOCUMENT_MAIL_PASSWORD_RULE:}
+    session:
+      idle-timeout: 15m
+      eseva-idle-timeout: 10m   # SRS-SEC-14 (fallback of the A-07 setting ESEVA_SESSION_IDLE_TIMEOUT)
+      absolute-timeout: 8h
+      cookie-name: FCISESSION
+      secure-cookie: true
+    secrets:
+      ephemeral-keys: false
+      audit-hmac-key: ${FCI_AUDIT_HMAC_KEY:}
+      data-encryption-key: ${FCI_DATA_ENCRYPTION_KEY:}
+    bootstrap:
+      sysadmin-login-id: ${FCI_BOOTSTRAP_SYSADMIN_LOGIN:sysadmin@fci.gov.in}
+      admin-initial-password: ${FCI_BOOTSTRAP_ADMIN_PASSWORD:}
+    management:
+      password-hash: ${FCI_METRICS_PASSWORD_HASH:}
+    # OD-144 PDF outputs: technical settings of one synchronous download (PENDING PDF-SETTINGS:
+    # confirm in the performance test; SLA 3 s interactive, 1 min download, 1,000 concurrent
+    # payslip users on salary day). Above max-concurrent renders a request waits max-wait, then
+    # 503 COM-503-EXPORT-BUSY with Retry-After; the O-01 Bulk PDF carries at most bulk-max payslips.
+    pdf:
+      max-concurrent: ${FCI_PDF_MAX_CONCURRENT:16}
+      max-wait: ${FCI_PDF_MAX_WAIT:2s}
+      retry-after: ${FCI_PDF_RETRY_AFTER:5s}
+      bulk-max: ${FCI_PDF_BULK_MAX:1000}
+  # Order copies and other attachments (SRS-G-30). The limits are CF-13 settings for FCI IT to
+  # confirm (tracker OQ-B3); keep them within the NGINX client_max_body_size of the upload locations
+  # and spring.servlet.multipart below. Files are virus-scanned by a ClamAV daemon (clamd).
+  documents:
+    max-file-bytes: 10485760
+    max-files-per-record: 10
+    scanner: clamd
+    clamd-host: ${FCI_CLAMD_HOST:127.0.0.1}
+    clamd-port: ${FCI_CLAMD_PORT:3310}
+    # Where stored files go (Form 16, return files, filing evidence, order copies, payslips):
+    # the folder (object-key prefix) in the store. HLD: report output on OCI Object Storage;
+    # decision D-1 keeps the bytes in the database for now, under the same keys. One prefix per
+    # deployment (FCI_DOCUMENT_KEY_PREFIX); the layout below it is FCI_DOCUMENTS_STORAGEKEYLAYOUT.
+    storage-key-prefix: ${FCI_DOCUMENT_KEY_PREFIX:fci-payroll}
+    storage-key-layout: "{prefix}/{entity}/{yyyy}/{mm}/{uuid}"
+  # List exports, CSV or Excel (SRS-G-13, ADR-0024): streamed on a bounded pool, read from one
+  # snapshot in batches, refused above max-rows ("narrow the filter"), never cut short.
+  export:
+    threads: 4              # downloads streaming at once
+    queue-capacity: 20      # waiting downloads; beyond them 503 COM-503-EXPORT-BUSY
+    timeout: 10m            # longest one download may stream
+    max-rows: 200000        # above: 422 COM-422-EXPORT-TOO-LARGE (Excel's limit is 1,048,575)
+    batch-size: 500         # rows read per batch inside the snapshot
+  # Lease on a payroll cycle instance (SRS-15-28, BR-CYC-015; plan 05 D-7): a lease whose heartbeat
+  # is older than this is taken over by the next action (logged EXPIRED). A computation renews it on
+  # every work unit and committed chunk. Technical setting for FCI IT, no pay effect.
+  cycle:
+    lease:
+      expire-after: 5m
+
+---
+# Online mode: the browser-facing instance. Flyway migrates here (the batch instance starts after it).
+spring:
+  config:
+    activate:
+      on-profile: online
+  autoconfigure:
+    exclude:
+      # No Spring Batch launch machinery on online (JobOperator, writable JobRepository): jobs run
+      # only on the batch instance. C-13 reads progress through the read-only BatchHistory
+      # (OnlineBatchReadOnlyConfig), which also refuses to start if launch machinery appears here.
+      # Boot 4 splits Batch into three auto-configurations: all three stay off.
+      - org.springframework.boot.batch.autoconfigure.BatchAutoConfiguration
+      - org.springframework.boot.batch.autoconfigure.BatchJobLauncherAutoConfiguration
+      - org.springframework.boot.batch.jdbc.autoconfigure.BatchJdbcAutoConfiguration
+      # Sign-in is the application's own (iam); the metrics user is not a bean: no generated
+      # in-memory user with a logged development password.
+      - org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
+fci:
+  common:
+    app-name: payroll-online
+  logging:
+    file-name: api              # api.json, api-security-audit.json (fci-logback.xml)
+
+# Batch mode: see application-batch.yml (loaded only with the batch profile).
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+server:
+  port: 8180
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+logging:
+  structured:
+    format:
+      console: ""
+fci:
+  # No ClamAV on a developer machine or in a demo: files are stored unscanned (refused in uat / prod).
+  documents:
+    scanner: none
+  common:
+    management-port: 0
+  api:
+    notification:
+      mode: log
+      log-codes: true
+    # Critical activities are confirmed without an OTP on a developer machine (project owner,
+    # 2026-10-23); UAT and production ask for it ('Y', the default; StartupGuards refuse 'N' there).
+    otp:
+      required: 'N'
+    session:
+      secure-cookie: false
+    secrets:
+      ephemeral-keys: true
+    bootstrap:
+      # Local only; documented in the README. Must be changed at first sign-in.
+      admin-initial-password: ${FCI_BOOTSTRAP_ADMIN_PASSWORD:Fci#Admin2026Local}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  flyway:
+    # A shared development database set up with the demo data keeps the demo seed versions (db/seed)
+    # in its history. A dev run without the demo profile has no such files, and validation would
+    # refuse to start ("applied migration not resolved locally"). Only the MISSING status is
+    # tolerated, only here: a changed checksum, a failed or an out-of-order migration is still
+    # refused, and uat / prod never take this profile (OD-117).
+    ignore-migration-patterns: '*:missing'
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+fci:
+  # No ClamAV on a developer machine or in a demo: files are stored unscanned (refused in uat / prod).
+  documents:
+    scanner: none
+  api:
+    notification:
+      mode: log
+      # The code is written to the log (devCode=...) so a developer or tester can copy it; the
+      # delivery to the registered mobile is UAT / production only (StartupGuards refuse it there).
+      log-codes: true
+    # Development: critical activities are confirmed without an OTP (project owner, 2026-10-23).
+    otp:
+      required: 'N'
+    secrets:
+      ephemeral-keys: true
+
+---
+# Demo data (docs/rbac/SEED_USERS.md): obviously fake users, one shared demo password. Adds the
+# db/seed location; refused together with prod (StartupGuards). OTPs are written to the log.
+spring:
+  config:
+    activate:
+      on-profile: demo
+  flyway:
+    locations: classpath:db/migration/{vendor},classpath:db/migration/common,classpath:db/seed
+    placeholders:
+      "[demo_evaluation]": 'Y'
+fci:
+  # No ClamAV on a developer machine or in a demo: files are stored unscanned (refused in uat / prod).
+  documents:
+    scanner: none
+  # OD-130: the demo stacks (local runs and Playwright) make forged calls on purpose. A run of
+  # security-offence.spec.ts deploys with -SecurityOffence Y.
+  security:
+    offence:
+      enabled: 'N'
+  api:
+    demo:
+      enabled: true
+    notification:
+      mode: log
+      log-codes: true
+    # The shared demo users sign in many times an hour (testers, the Playwright suite), and every
+    # sign-in of a sensitive role now asks an OTP step-up: the issuance cap is raised here only
+    # (owner 2026-11-07, OD-131: 500 an hour on the demo profile). The default (5) applies
+    # everywhere else, UAT and production included.
+    otp:
+      max-per-hour: ${FCI_API_OTP_MAX_PER_HOUR:500}
+      # OD-146: the demo OTP code viewer (the signed-in evaluator's own last code, kept in memory
+      # until it expires). StartupGuards refuse it without demo, with prod and in a real UAT.
+      demo-viewer: true
+    # OD-149: the most months of one E-01 bulk payslip download. A DEMO value: unset elsewhere
+    # (the bulk download is then refused "not configured"); FCI to set it (PENDING PDF-SETTINGS).
+    pdf:
+      member-bulk-max-periods: ${FCI_PDF_MEMBER_BULK_MAX:12}
+
+# No uat / prod sections: those environments differ only by external configuration (config/app,
+# loaded from fci.config.dir), so the same WAR is promoted unchanged. The uat / prod profiles still
+# drive the strict start-up checks (StartupGuards), which read the active profiles directly.
+
+
+---
+# The VOLUME data set (docs/perf/VOLUME_DATA.md): 50,000 employees over the full FCI hierarchy, for
+# volume and performance runs only (owner 2026-10-25); always together with demo, never alone and
+# never for the normal tests. A volume database is disposable (its seed is numbered V900).
+spring:
+  config:
+    activate:
+      on-profile: volume
+  flyway:
+    locations: classpath:db/migration/{vendor},classpath:db/migration/common,classpath:db/seed,classpath:db/volume/common,classpath:db/volume/{vendor}
+    # Both data sets write the cycles of DH001 and CH001 for the same months: the demo-evaluation
+    # seeds stay out (OD-141).
+    placeholders:
+      "[demo_evaluation]": 'N'
+    # The set sits above the schema line (V900 / V950): on a database that keeps it (Oracle, local), a
+    # newer schema migration has a lower version and is applied after it (out of order). Never in prod:
+    # StartupGuards refuse this data set there.
+    out-of-order: true
+---
+# The EDGE-CASE data set (docs/test-data/EDGE_DATA.md, owner 2026-10-30): rows for every page and its
+# sections that exercise the edge cases - each status of each lifecycle, empty and maximal optional
+# fields, boundary amounts and dates, past / future / ended versions, pending, returned and rejected
+# approvals, lists longer than one page. db/edge/h2 (the source) and db/edge/oracle (generated by
+# db/tools/seed/edge_h2_to_oracle.py); always together with demo, never with volume (both write the
+# cycles of the same offices and months) and never in production or a real UAT (StartupGuards). V950+.
+spring:
+  config:
+    activate:
+      on-profile: edge
+  flyway:
+    locations: classpath:db/migration/{vendor},classpath:db/migration/common,classpath:db/seed,classpath:db/edge/{vendor}
+    # Both data sets write the cycles of DH001 and CH001 for the same months: the demo-evaluation
+    # seeds stay out (OD-141).
+    placeholders:
+      "[demo_evaluation]": 'N'
+    # The set sits above the schema line (V900 / V950): on a database that keeps it (Oracle, local), a
+    # newer schema migration has a lower version and is applied after it (out of order). Never in prod:
+    # StartupGuards refuse this data set there.
+    out-of-order: true
+---
+# The SCREEN DEMO data set (OD-141 D-screens, owner 2026-11-09; docs/db/INSTALL_KIT.md): the rows the
+# FCI evaluation walks through screen by screen, its own data set like edge. db/demo-screens/common
+# (vendor-neutral scripts, the normal case) and db/demo-screens/{vendor} (only where the SQL differs);
+# both named separately, because Flyway scans a location recursively. Unlike edge, it sits ON TOP of
+# the full demo data, the demo-evaluation seeds (V082_20 .. V082_39) included: demo_evaluation stays
+# 'Y'. Always together with demo, never with volume or edge (both turn the demo-evaluation seeds off
+# and write the same offices and months) and never in production (StartupGuards). H2 or Oracle. V960+.
+spring:
+  config:
+    activate:
+      on-profile: screens
+  flyway:
+    locations: classpath:db/migration/{vendor},classpath:db/migration/common,classpath:db/seed,classpath:db/demo-screens/common,classpath:db/demo-screens/{vendor}
+    placeholders:
+      "[demo_evaluation]": 'Y'
+    # The set sits above the schema line (V900 / V950 / V960): on a database that keeps it (Oracle,
+    # local), a newer schema migration has a lower version and is applied after it (out of order).
+    # Never in prod: StartupGuards refuse this data set there.
+    out-of-order: true
+---
+# The worker clones of the demo users, for parallel Playwright lanes only (owner 2026-11-07,
+# frontend/e2e/README.md): deploy-local.ps1 -E2EParallelUsers. Always with demo on H2, never with volume, oracle
+# or prod (StartupGuards); the release WAR leaves db/e2e-parallel out. Above every other script (V990).
+spring:
+  config:
+    activate:
+      on-profile: e2e-parallel
+  flyway:
+    locations: classpath:db/migration/{vendor},classpath:db/migration/common,classpath:db/seed,classpath:db/e2e-parallel/{vendor}
+---
+spring:
+  config:
+    activate:
+      on-profile: e2e-parallel & edge
+  flyway:
+    locations: classpath:db/migration/{vendor},classpath:db/migration/common,classpath:db/seed,classpath:db/edge/{vendor},classpath:db/e2e-parallel/{vendor}
+---
+spring:
+  config:
+    activate:
+      on-profile: e2e-parallel & screens
+  flyway:
+    locations: classpath:db/migration/{vendor},classpath:db/migration/common,classpath:db/seed,classpath:db/demo-screens/common,classpath:db/demo-screens/{vendor},classpath:db/e2e-parallel/{vendor}
+---
+# PLACEHOLDER HRMS export layout for X-07 (decision D-2) - local, dev and demo runs only. NOT FCI's
+# format: no source describes the HRMS export, so the base configuration has none and a real
+# deployment refuses uploads (HFB-503-FORMAT) until FCI's layout is configured under the same keys.
+spring:
+  config:
+    activate:
+      on-profile: "local | dev | demo"
+fci:
+  hrms-fallback:
+    formats:
+      ATTENDANCE_LEAVE:
+        date-pattern: dd-MM-yyyy
+        columns:
+          employeeNumber: EMP_NO
+          periodFrom: FROM_DATE
+          periodTo: TO_DATE
+          payDays: PAY_DAYS
+          lwpDays: LWP_DAYS
+          halfPayDays: HALF_PAY_DAYS
+          otherLeaveCode: LEAVE_CODE
+          otherLeaveDays: LEAVE_DAYS
+      SUSPENSION_ABSCONDING:
+        date-pattern: dd-MM-yyyy
+        columns:
+          employeeNumber: EMP_NO
+          recordType: EVENT
+          eventEffectiveDate: EFFECTIVE_DATE
+          orderNo: ORDER_NO
+          orderDate: ORDER_DATE
+          issuingAuthority: ISSUED_BY
+# >>> hrms-mock (generated by scripts/integration/gen_hrms_profile.py, do not edit by hand)
+---
+# Profile hrms-mock: Payroll CALLS the HRMS APIs (direction OUTBOUND) at one base address - here the FCI HRMS
+# mock server (default http://localhost:8080). Allowed only on local, dev and demo runs: StartupGuards refuse it
+# with prod and with a uat that is not a demo stack. One setting per API holds its path. The base address and the
+# secrets come from the ENVIRONMENT (12-factor); set per environment: FCI_HRMS_BASE_URL, FCI_HRMS_API_KEY (or
+# _FILE), FCI_HRMS_USERNAME, FCI_HRMS_PASSWORD (or _FILE). Nothing secret is in this file. One API's path is
+# overridden with FCI_INTEGRATION_HRMS_API_<CODE>_PATH, its direction with ..._DIRECTION (INBOUND = Payroll
+# publishes it, OUTBOUND = Payroll calls it); its call policy under api.<code>.call.* (see HrmsApiProperties).
+spring:
+  config:
+    activate:
+      on-profile: hrms-mock
+fci:
+  integration:
+    hrms:
+      base-url: ${FCI_HRMS_BASE_URL:http://localhost:8080}
+      client:
+        api-key: ${FCI_HRMS_API_KEY:}
+        api-key-file: ${FCI_HRMS_API_KEY_FILE:}
+        credentials:
+          username: ${FCI_HRMS_USERNAME:}
+          password: ${FCI_HRMS_PASSWORD:}
+          password-file: ${FCI_HRMS_PASSWORD_FILE:}
+          token-skew-seconds: 60
+      # Call policy for every API below (flags Y/N, times in ms); one API overrides any of it under
+      # api.<code>.call.* (timeouts, mask-data, log-request, log-response, pool.*).
+      defaults:
+        connect-timeout-ms: 10000
+        read-timeout-ms: 60000
+        timeout-ms: 30000
+        mask-data: Y
+        log-request: Y
+        log-response: Y
+      # The Administrator's API console of X-03 (HrmsConsoleService) may call every OUTBOUND API below.
+      console:
+        enabled: true
+      # Concurrent calls and the wait for a free slot, per API (R-INT); the connection test has its own.
+      bulkhead:
+        connection_test: {max-concurrent-calls: 2, max-wait-millis: 500}
+        get_advance_loan_hdr_status: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_leave_encashment_status: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_loan_status: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_ltc_encash_status: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_medical_claim_status: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_ota_status: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_request_brief_case_reimbursement: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_request_laptop_reimbursement: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_request_local_travel_allowance: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_request_mobile_reimbursement: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_request_newspaper_allowance: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_request_pay_ltc_hometown: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_request_pay_travel_allowance: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_request_tele_data_reimbursement: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_advance_loan_hdr: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_brief_case_reimbursement: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_laptop_reimbursement: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_leave_encashment: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_loan_fore_closure: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_loan_reschedule: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_local_travel_allowance: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_ltc_encash: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_medical_claim: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_mobile_reimbursement: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_newspaper_allowance: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_ota: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_pay_ltc_hometown: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_pay_travel_allowance: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_tele_data_reimbursement: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        token: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        updating_hra_da: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        cancel_advance_loan: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        cancel_brief_case_reimbursement: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        cancel_laptop_reimbursement: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        cancel_leave_detail: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        cancel_leave_encash: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        cancel_local_travel_allowance: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        cancel_ltc_encash: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        cancel_medical_claim: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        cancel_mobile_reimbursement: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        cancel_newspaper_allowance: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        cancel_ota: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        cancel_pay_ltc_hometown: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        cancel_pay_travel_allowance: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        cancel_tele_data_reimbursement: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        forecast_report: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_request_laptop_buyback: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_request_pay_liveries_reimbursement: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        getcpfslip: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        getpayslip: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        getsalarycontrolregister: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_basic_syncup_status: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        get_payroll_statust: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        post_cafeteria_allowance: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_laptop_buyback: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_lease_accomodation: {max-concurrent-calls: 5, max-wait-millis: 1000}
+        request_pay_liveries_reimbursement: {max-concurrent-calls: 5, max-wait-millis: 1000}
+      api:
+        get_advance_loan_hdr_status: {path: /get-advance-loan-hdr-status, direction: OUTBOUND}
+        get_leave_encashment_status: {path: /get-leave-encashment-status, direction: OUTBOUND}
+        get_loan_status: {path: /get-loan-status, direction: OUTBOUND}
+        get_ltc_encash_status: {path: /get-ltc-encash-status, direction: OUTBOUND}
+        get_medical_claim_status: {path: /get-medical-claim-status, direction: OUTBOUND}
+        get_ota_status: {path: /get-ota-status, direction: OUTBOUND}
+        get_request_brief_case_reimbursement: {path: /get-request-brief-case-reimbursement, direction: OUTBOUND}
+        get_request_laptop_reimbursement: {path: /get-request-laptop-reimbursement, direction: OUTBOUND}
+        get_request_local_travel_allowance: {path: /get-request-local-travel-allowance, direction: OUTBOUND}
+        get_request_mobile_reimbursement: {path: /get-request-mobile-reimbursement, direction: OUTBOUND}
+        get_request_newspaper_allowance: {path: /get-request-newspaper-allowance, direction: OUTBOUND}
+        get_request_pay_ltc_hometown: {path: /get-request-pay-ltc-hometown, direction: OUTBOUND}
+        get_request_pay_travel_allowance: {path: /get-request-pay-travel-allowance, direction: OUTBOUND}
+        get_request_tele_data_reimbursement: {path: /get-request-tele-data-reimbursement, direction: OUTBOUND}
+        request_advance_loan_hdr: {path: /request-advance-loan-hdr, direction: OUTBOUND}
+        request_brief_case_reimbursement: {path: /request-brief-case-reimbursement, direction: OUTBOUND}
+        request_laptop_reimbursement: {path: /request-laptop-reimbursement, direction: OUTBOUND}
+        request_leave_encashment: {path: /request-leave-encashment, direction: OUTBOUND}
+        request_loan_fore_closure: {path: /request-loan-fore-closure, direction: OUTBOUND}
+        request_loan_reschedule: {path: /request-loan-reschedule, direction: OUTBOUND}
+        request_local_travel_allowance: {path: /request-local-travel-allowance, direction: OUTBOUND}
+        request_ltc_encash: {path: /request-ltc-encash, direction: OUTBOUND}
+        request_medical_claim: {path: /request-medical-claim, direction: OUTBOUND}
+        request_mobile_reimbursement: {path: /request-mobile-reimbursement, direction: OUTBOUND}
+        request_newspaper_allowance: {path: /request-newspaper-allowance, direction: OUTBOUND}
+        request_ota: {path: /request-ota, direction: OUTBOUND}
+        request_pay_ltc_hometown: {path: /request-pay-ltc-hometown, direction: OUTBOUND}
+        request_pay_travel_allowance: {path: /request-pay-travel-allowance, direction: OUTBOUND}
+        request_tele_data_reimbursement: {path: /request-tele-data-reimbursement, direction: OUTBOUND}
+        token: {path: /token, direction: OUTBOUND}
+        updating_hra_da: {path: /updating-hra-da, direction: OUTBOUND}
+        cancel_advance_loan: {path: /cancel-advance-loan, direction: OUTBOUND}
+        cancel_brief_case_reimbursement: {path: /cancel-brief-case-reimbursement, direction: OUTBOUND}
+        cancel_laptop_reimbursement: {path: /cancel-laptop-reimbursement, direction: OUTBOUND}
+        cancel_leave_detail: {path: /cancel-leave-detail, direction: OUTBOUND}
+        cancel_leave_encash: {path: /cancel-leave-encash, direction: OUTBOUND}
+        cancel_local_travel_allowance: {path: /cancel-local-travel-allowance, direction: OUTBOUND}
+        cancel_ltc_encash: {path: /cancel-ltc-encash, direction: OUTBOUND}
+        cancel_medical_claim: {path: /cancel-medical-claim, direction: OUTBOUND}
+        cancel_mobile_reimbursement: {path: /cancel-mobile-reimbursement, direction: OUTBOUND}
+        cancel_newspaper_allowance: {path: /cancel-newspaper-allowance, direction: OUTBOUND}
+        cancel_ota: {path: /cancel-ota, direction: OUTBOUND}
+        cancel_pay_ltc_hometown: {path: /cancel-pay-ltc-hometown, direction: OUTBOUND}
+        cancel_pay_travel_allowance: {path: /cancel-pay-travel-allowance, direction: OUTBOUND}
+        cancel_tele_data_reimbursement: {path: /cancel-tele-data-reimbursement, direction: OUTBOUND}
+        forecast_report: {path: /forecast-report, direction: OUTBOUND}
+        get_request_laptop_buyback: {path: /get-request-laptop-buyback, direction: OUTBOUND}
+        get_request_pay_liveries_reimbursement: {path: /get-request-pay-liveries-reimbursement, direction: OUTBOUND}
+        getcpfslip: {path: /getCpfSlip, direction: OUTBOUND}
+        getpayslip: {path: /getPayslip, direction: OUTBOUND}
+        getsalarycontrolregister: {path: /getSalaryControlRegister, direction: OUTBOUND}
+        get_basic_syncup_status: {path: /get-basic-syncup-status, direction: OUTBOUND}
+        get_payroll_statust: {path: /get-payroll-statust, direction: OUTBOUND}
+        post_cafeteria_allowance: {path: /post-cafeteria-allowance, direction: OUTBOUND}
+        request_laptop_buyback: {path: /request-laptop-buyback, direction: OUTBOUND}
+        request_lease_accomodation: {path: /request-lease-accomodation, direction: OUTBOUND}
+        request_pay_liveries_reimbursement: {path: /request-pay-liveries-reimbursement, direction: OUTBOUND}
+# <<< hrms-mock

@@ -1,0 +1,35 @@
+# Oracle Database (ADR-0019; owner 2026-11-01: Oracle is the application's database, H2 only for tests).
+# DEV, UAT and production: an ON-PREMISES Oracle (19c or later), reached by host, port and service over the
+# data-centre network; set per environment in the server's backend/application.yaml (config/app/backend):
+#     fci.oracle.host / fci.oracle.port / fci.oracle.service / fci.oracle.username
+# and the password as the secret file secrets/backend/spring.datasource.password (ADR-0013).
+# A LOCAL machine adds profile oracle-adb (application-oracle-adb.yml): the cloud Autonomous Database through
+# its wallet. That profile is never used on a server (StartupGuards). docs/db/ORACLE_LOCAL.md.
+#
+# The SQL stays within Oracle 19c (scripts/oracle_19c_check.py). Schema owner with least privilege
+# (CREATE SESSION / TABLE / VIEW / SEQUENCE / TRIGGER, quota), never a DBA account: db/tools/oracle.
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@//${fci.oracle.host}:${fci.oracle.port:1521}/${fci.oracle.service}
+    username: ${fci.oracle.username:FCI_PAYROLL}
+    driver-class-name: oracle.jdbc.OracleDriver
+    hikari:
+      # An OLTP application: no parallel DML in its sessions. Parallel DML is off by default on an
+      # on-premises database and on by default on an Autonomous Database, where a parallel change of a
+      # table changed earlier in the same transaction fails with ORA-12839.
+      connection-init-sql: ALTER SESSION DISABLE PARALLEL DML
+      connection-timeout: 10000
+      validation-timeout: 5000
+      # Renewed below any firewall or database idle limit.
+      max-lifetime: 1500000
+      keepalive-time: 300000
+      data-source-properties:
+        # Fewer round trips for the paged lists and exports.
+        defaultRowPrefetch: 100
+        oracle.net.CONNECT_TIMEOUT: 10000
+        oracle.jdbc.ReadTimeout: 600000
+  jpa:
+    properties:
+      hibernate:
+        # Replaces the H2 Oracle-mode dialect of application.yaml.
+        dialect: org.hibernate.dialect.OracleDialect

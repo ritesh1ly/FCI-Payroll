@@ -1,0 +1,64 @@
+# Integration-test profile, always combined with "demo" (ApiTestSupport): H2 in memory (Oracle
+# mode) with the target DDL, reference data and the demo seed; ephemeral keys; notifications are
+# captured by the test. The BFF public key is injected by ApiTestSupport.
+spring:
+  datasource:
+    url: jdbc:h2:mem:fci_api_it_${random.uuid};MODE=Oracle;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
+  # OD-141 / OD-142: the demo-evaluation seeds (locked demo months at DH001 / CH001, the test office of
+  # the Playwright cycle specs, demo statutory rates) stay out of the suites: they fix their own months,
+  # rates and floors (application.yaml spring.flyway.placeholders).
+  flyway:
+    placeholders:
+      "[demo_evaluation]": 'N'
+logging:
+  structured:
+    format:
+      console: ""
+fci:
+  # OD-130: the suites make forged calls on purpose. SecurityOffenceIT turns it on for itself.
+  security:
+    offence:
+      enabled: 'N'
+  common:
+    management-port: 0
+  # Exports read in batches of 10 here (default 500), so every export test crosses many batch
+  # boundaries: where rows could be skipped or repeated if the order or the snapshot were wrong.
+  export:
+    batch-size: 10
+  # Tests replace the scanner where they need a verdict; otherwise files are stored unscanned.
+  documents:
+    scanner: none
+  # Fixtures write masters and rules with SQL: the cache region versions are read on every cache
+  # read here (production: every 10 s), so a fixture's version bump is seen at once.
+  cache:
+    check-interval: 0s
+  api:
+    notification:
+      mode: log
+    secrets:
+      ephemeral-keys: true
+    # MockMvc calls all come from 127.0.0.1: the sign-in limits are raised here and tested on their
+    # own in RateLimitIT (its own context with the production defaults).
+    rate-limits:
+      login-per-ip-per-minute: 100000
+      login-per-username-per-minute: 100000
+      forgot-per-ip-per-hour: 100000
+      forgot-per-identifier-per-hour: 100000
+      reset-per-ip-per-hour: 100000
+      # Every refused sign-in of the suite would wait out the 600 ms floor (threat T1); the floor is
+      # proved by LoginServiceFlowTest.
+      login-failure-floor-millis: 0
+    # Every IT shares the demo administrators: the OTP issuance cap (default 5 per user, action and
+    # hour) is raised to its maximum here and tested with the default-like cap in RateLimitIT.
+    otp:
+      max-per-hour: 500
+      # Every IT signs in the shared demo users many times an hour: a sign-in OTP each time would
+      # exceed the issuance cap. The OTP step of the sign-in (SRS-G-48, OD-36) is proved by
+      # LoginOtpIT, which switches it on.
+      at-login: false
+    maintenance:
+      interval: PT24H
+---
+# Test-only metrics credentials (password "Metrics#It-Only-2026"), in the format
+# deploy/scripts/GenerateSecrets.java writes.
+fci.api.management.password-hash: "{pbkdf2@SpringSecurity_v5_8}00112233445566778899aabbccddeeff4e384988b3172d8fac2d19b114a3aa7094eaf8acdb53c3f8a52dbdcdf563d465"

@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="FCI full stack (H2 + online + batch + frontend)" type="CompoundRunConfigurationType" folderName="FCI local">
+    <toRun name="1. H2 server (:9092)" type="GradleRunConfiguration" />
+    <toRun name="2. Backend online (:8180)" type="GradleRunConfiguration" />
+    <toRun name="3. Backend batch (:8190)" type="GradleRunConfiguration" />
+    <toRun name="4. Frontend (next dev, :3000)" type="js.build_tools.npm" />
+    <method v="2" />
+  </configuration>
+</component>
