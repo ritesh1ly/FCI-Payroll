@@ -1,5 +1,5 @@
 # Quality gate (docs/quality/QUALITY_GATES.md). OD-155 (owner 2026-11-09, replaces OD-122's manual-only): runs on
-# every push to feature/Oracle, every pull request into it, and by hand (Actions > ci > Run workflow); a newer push
+# every push to main, every pull request into it, and by hand (Actions > ci > Run workflow); a newer push
 # cancels the run in progress. Any gate below its threshold fails the run:
 #   backend         ./gradlew :backend:staticCheck (Spotless, compile of every source set with -Werror, SpotBugs +
 #                   FindSecBugs SAST) -> SARIF to code scanning; Sonar when SONAR_TOKEN is set; then the release
@@ -23,9 +23,9 @@ name: ci
 
 on:
   push:
-    branches: [feature/Oracle]
+    branches: [main]
   pull_request:
-    branches: [feature/Oracle]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
