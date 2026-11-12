@@ -91,14 +91,19 @@ final class OracleKitTool {
         for (Built b : h2) {
             List<String> d = converted.isEmpty() ? drift : new ArrayList<>();
             Catalog c = OracleFallback.convert(b.catalog(), replay, d);
+            // The Flyway history as Flyway writes it on Oracle (Oracle scripts, checksums, ranks),
+            // not the H2 build's (OracleHistory).
+            Map<String, KitData.TableRows> rows =
+                    OracleHistory.withOracleHistory(
+                            OracleFallback.project(b.rows(), c), db, b.profile());
             converted.add(
                     new Built(
                             b.profile(),
                             b.url(),
                             c,
-                            OracleFallback.project(b.rows(), c),
+                            rows,
                             b.clock(),
-                            b.history()));
+                            rows.get(OracleHistory.TABLE).rows().size()));
         }
         Map<String, String> files =
                 KitGenerator.generate(

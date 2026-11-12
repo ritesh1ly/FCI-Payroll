@@ -91,6 +91,26 @@ class StartupAndKeyTest {
                 .doesNotThrowAnyException();
     }
 
+    /**
+     * ADR-0013 (owner's DEV run 2026-11-11: -Dfci.profile=dev,Oracle,demo left
+     * application-oracle.yml unloaded): Spring profiles are case-sensitive, so a known profile
+     * spelt in another case is refused with the expected spelling, an unknown one with the known
+     * list; every known one is accepted by this check.
+     */
+    @Test
+    void ADR_0013_aProfileInAnotherCaseOrUnknownIsRefusedBeforeItsConfigurationIsSkipped() {
+        refused(env("dev", "Oracle", "online"), "write 'oracle'");
+        refused(env("dev", "Oracle", "online"), "Unknown profile 'Oracle'");
+        refused(env("ONLINE"), "write 'online'");
+        refused(
+                env("dev", "orcl", "online"),
+                "Unknown profile 'orcl' (known: [batch, chaos-monkey, demo, dev, e2e-parallel,"
+                        + " edge, hrms-mock, it, local, online, oracle, oracle-adb, prod, screens,"
+                        + " shared-h2, uat, volume])");
+        allowed(env("local", "online", "shared-h2"));
+        allowed(env("dev", "oracle", "online"));
+    }
+
     @Test
     void exactlyOneOfOnlineAndBatchMustBeActive() {
         assertThatThrownBy(

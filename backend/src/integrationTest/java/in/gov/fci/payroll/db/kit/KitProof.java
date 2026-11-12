@@ -356,7 +356,9 @@ final class KitProof {
         String root = slashes(repo.toAbsolutePath()) + "/";
         List<Path> sources = new ArrayList<>();
         try (var files = Files.list(repo.resolve("db").resolve("h2-setup"))) {
-            sources.addAll(files.toList());
+            // the run-alls only: the consolidated/ folder (OD-164) holds self-contained files that
+            // build_setup_script.py proves step by step against the kit
+            sources.addAll(files.filter(Files::isRegularFile).toList());
         }
         try (var files = Files.list(repo.resolve("db").resolve("install").resolve("h2"))) {
             sources.addAll(

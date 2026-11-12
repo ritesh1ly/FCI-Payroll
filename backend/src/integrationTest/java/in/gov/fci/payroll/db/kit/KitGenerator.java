@@ -313,13 +313,18 @@ public final class KitGenerator {
                                         meta),
                                 ddl)
                         : KitWriter.oracleScript(
-                                header(
-                                        vendor,
-                                        KitFiles.DDL,
-                                        "creates every object in its final state",
-                                        false,
-                                        meta),
-                                ddl));
+                                        header(
+                                                vendor,
+                                                KitFiles.DDL,
+                                                "creates every object in its final state",
+                                                false,
+                                                meta),
+                                        ddl)
+                                // step 0: the Partitioning option, before any DDL
+                                .replace(
+                                        KitWriter.ORACLE_SESSION,
+                                        KitWriter.ORACLE_SESSION
+                                                + KitWriter.ORACLE_PARTITIONING_CHECK));
         for (int i = 0; i < data.size(); i++) {
             Built d = data.get(i);
             Built s = structure.get(i);

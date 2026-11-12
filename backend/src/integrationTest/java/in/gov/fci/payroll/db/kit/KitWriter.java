@@ -414,6 +414,39 @@ final class KitWriter {
                     + "ALTER SESSION SET NLS_LANGUAGE = 'AMERICAN';\n"
                     + "ALTER SESSION SET NLS_TERRITORY = 'AMERICA';\n";
 
+    /**
+     * Step 0 of 02_ddl on Oracle: the kit partitions tables as DDL v4.0 defines (interval range,
+     * hash subpartitions, LOCAL indexes), which needs the Partitioning option (Enterprise Edition
+     * or an Autonomous Database). Stops before any DDL when v$option says it is off; a login that
+     * cannot read v$option gets a note for the DBA and the run goes on.
+     */
+    static final String ORACLE_PARTITIONING_CHECK =
+            "\nPROMPT Step 0: the Partitioning option (DDL v4.0 partitions the large tables)\n"
+                    + "DECLARE\n"
+                    + "    v VARCHAR2(64);\n"
+                    + "BEGIN\n"
+                    + "    EXECUTE IMMEDIATE 'SELECT value FROM v$option WHERE parameter ="
+                    + " ''Partitioning''' INTO v;\n"
+                    + "    IF v <> 'TRUE' THEN\n"
+                    + "        RAISE_APPLICATION_ERROR(-20990, 'The Partitioning option is not"
+                    + " enabled (v$option Partitioning = ' || v || '): DDL v4.0 partitions the"
+                    + " large tables; use Oracle Enterprise Edition with Partitioning or an"
+                    + " Autonomous Database');\n"
+                    + "    END IF;\n"
+                    + "EXCEPTION\n"
+                    + "    WHEN NO_DATA_FOUND THEN\n"
+                    + "        RAISE_APPLICATION_ERROR(-20990, 'v$option does not list the"
+                    + " Partitioning option: DDL v4.0 needs it');\n"
+                    + "    WHEN OTHERS THEN\n"
+                    + "        IF SQLCODE = -942 THEN\n"
+                    + "            DBMS_OUTPUT.PUT_LINE('NOTE: this login cannot read v$option:"
+                    + " the DBA must confirm the Partitioning option (DDL v4.0 needs it)');\n"
+                    + "        ELSE\n"
+                    + "            RAISE;\n"
+                    + "        END IF;\n"
+                    + "END;\n"
+                    + "/\n";
+
     static String oracleScript(String header, List<Step> steps) {
         StringBuilder b = new StringBuilder(header).append(ORACLE_SESSION);
         String section = null;

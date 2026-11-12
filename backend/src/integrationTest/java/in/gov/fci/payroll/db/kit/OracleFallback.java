@@ -107,6 +107,9 @@ final class OracleFallback {
         boolean defaultOnNull;
         String identity;
         Boolean notNull;
+
+        /** GENERATED ALWAYS AS (expr) VIRTUAL, or null. */
+        String virtual;
     }
 
     /** The static replay of the Oracle migrations. */
@@ -119,6 +122,12 @@ final class OracleFallback {
         final Map<String, String> sequences = new TreeMap<>();
         final Map<String, String> comments = new LinkedHashMap<>();
         final List<String> unparsed = new ArrayList<>();
+
+        /** Table name to its physical clause after the column list (partitioning, storage). */
+        final Map<String, String> physical = new TreeMap<>();
+
+        /** Constraints created USING INDEX LOCAL. */
+        final Set<String> localConstraints = new java.util.TreeSet<>();
     }
 
     /** Replays {@code db/migration/oracle} and {@code db/migration/common} in version order. */
@@ -183,11 +192,25 @@ final class OracleFallback {
         String up = sql.toUpperCase(Locale.ROOT);
         Matcher m;
         if ((m = CREATE_TABLE.matcher(sql)).matches()) {
+            // The column list is the first bracket after the name, matched by depth: what follows
+            // it is the table's physical clause (PARTITION BY ... INTERVAL / SUBPARTITION BY HASH,
+            // PCTFREE, ROW STORE COMPRESS, LOB ... STORE AS SECUREFILE), carried into the kit.
+            String name = m.group(2).toUpperCase(Locale.ROOT);
+            int open = m.start(3) - 1;
+            int close = closing(sql, open);
+            String body = sql.substring(open + 1, close);
+            String physical = sql.substring(close + 1).strip().replaceAll(";\\s*$", "").strip();
             LinkedHashMap<String, OraColumn> cols = new LinkedHashMap<>();
-            for (String item : split(m.group(3))) {
+            for (String item : split(body)) {
                 column(cols, item, false);
             }
-            r.tables.put(m.group(2).toUpperCase(Locale.ROOT), cols);
+            localConstraints(r, body);
+            r.tables.put(name, cols);
+            if (physical.isEmpty()) {
+                r.physical.remove(name);
+            } else {
+                r.physical.put(name, physical);
+            }
         } else if ((m = ALTER_TABLE.matcher(sql)).matches()) {
             alter(r, m.group(1).toUpperCase(Locale.ROOT), m.group(2).strip());
         } else if ((m = NAMED.matcher(sql)).find()) {
@@ -210,6 +233,7 @@ final class OracleFallback {
             switch (m.group(1).toUpperCase(Locale.ROOT)) {
                 case "TABLE" -> {
                     r.tables.remove(name);
+                    r.physical.remove(name);
                     r.indexTable
                             .entrySet()
                             .removeIf(
@@ -241,6 +265,9 @@ final class OracleFallback {
                                 .replaceFirst("(?i)" + Pattern.quote(m.group(1)), to));
             } else if (r.tables.containsKey(from)) {
                 r.tables.put(to, r.tables.remove(from));
+                if (r.physical.containsKey(from)) {
+                    r.physical.put(to, r.physical.remove(from));
+                }
             }
         } else if ((m = COMMENT.matcher(sql)).find()) {
             String target =
@@ -278,6 +305,55 @@ final class OracleFallback {
         }
     }
 
+    /** The index of the bracket that closes the one at {@code open} (literals respected). */
+    static int closing(String s, int open) {
+        int depth = 0;
+        boolean str = false;
+        for (int i = open; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\'') {
+                str = !str;
+            } else if (!str && c == '(') {
+                depth++;
+            } else if (!str && c == ')' && --depth == 0) {
+                return i;
+            }
+        }
+        throw new IllegalStateException("unbalanced brackets: " + KitSteps.first(s));
+    }
+
+    private static final Pattern LOCAL_CONSTRAINT =
+            Pattern.compile(
+                    "\\bCONSTRAINT\\s+\"?(\\w+)\"?.*\\bUSING\\s+INDEX\\s+LOCAL\\b",
+                    Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+    /**
+     * Constraints whose index the migrations create LOCAL (on a partitioned table), one item of a
+     * column list or ALTER TABLE ADD at a time (top-level commas split them).
+     */
+    private static void localConstraints(Replay r, String text) {
+        for (String item : split(text)) {
+            Matcher m = LOCAL_CONSTRAINT.matcher(item);
+            if (m.find()) {
+                r.localConstraints.add(m.group(1).toUpperCase(Locale.ROOT));
+            }
+        }
+    }
+
+    private static final Pattern VIRTUAL =
+            Pattern.compile("\\bGENERATED\\s+ALWAYS\\s+AS\\s*\\(", Pattern.CASE_INSENSITIVE);
+
+    /** "GENERATED ALWAYS AS (expr) VIRTUAL" of a column definition, else null. */
+    static String virtual(String rest) {
+        Matcher m = VIRTUAL.matcher(rest);
+        if (!m.find() || IDENTITY.matcher(rest).find()) {
+            return null;
+        }
+        int open = m.end() - 1;
+        int close = closing(rest, open);
+        return "GENERATED ALWAYS AS " + rest.substring(open, close + 1) + " VIRTUAL";
+    }
+
     private static boolean onTable(String triggerDdl, String table) {
         Matcher on = ON_TABLE.matcher(stripComments(triggerDdl));
         return on.find() && on.group(1).equalsIgnoreCase(table);
@@ -287,6 +363,7 @@ final class OracleFallback {
         LinkedHashMap<String, OraColumn> cols =
                 r.tables.computeIfAbsent(table, k -> new LinkedHashMap<>());
         String up = rest.toUpperCase(Locale.ROOT);
+        localConstraints(r, rest);
         if (up.startsWith("ADD CONSTRAINT")
                 || up.startsWith("DROP CONSTRAINT")
                 || up.startsWith("ADD PRIMARY")
@@ -368,6 +445,10 @@ final class OracleFallback {
         Matcher type = TYPE.matcher(rest);
         if (type.find()) {
             c.type = normaliseType(type.group(1));
+        }
+        String virtual = virtual(rest);
+        if (virtual != null) {
+            c.virtual = virtual;
         }
         Matcher id = IDENTITY.matcher(rest);
         if (id.find()) {
@@ -570,7 +651,20 @@ final class OracleFallback {
                                 .append(' ')
                                 .append(type);
                 Identity id = null;
-                if (c.identity() != null) {
+                if (o.virtual != null) {
+                    // A virtual column (V034_1 opening_balance_correction.difference_amount): the
+                    // database computes it, the data scripts never write it.
+                    line.append(' ').append(o.virtual);
+                } else if (c.identity() != null && o.identity == null && o.type != null) {
+                    // H2 makes the column an identity, the Oracle migrations do not (the Spring
+                    // Batch ids take their sequences, V011): the kit follows Oracle.
+                    drift.add(
+                            "column "
+                                    + t.name()
+                                    + "."
+                                    + c.name()
+                                    + ": identity in H2 only (Oracle takes a sequence)");
+                } else if (c.identity() != null) {
                     String clause =
                             o.identity != null
                                     ? o.identity
@@ -587,7 +681,7 @@ final class OracleFallback {
                     line.append(o.defaultOnNull ? " DEFAULT ON NULL " : " DEFAULT ")
                             .append(o.defaultExpr);
                 }
-                if (!c.nullable()) {
+                if (!c.nullable() && o.virtual == null) {
                     line.append(" NOT NULL");
                 }
                 lines.add(line.toString());
@@ -597,9 +691,9 @@ final class OracleFallback {
                                 type,
                                 kindOf(type, c.kind()),
                                 c.nullable(),
-                                c.identity() == null ? o.defaultExpr : null,
+                                c.identity() == null && o.virtual == null ? o.defaultExpr : null,
                                 id,
-                                false));
+                                o.virtual != null));
             }
             for (String name : ora.keySet()) {
                 if (t.columns().stream().noneMatch(c -> c.name().equals(name))) {
@@ -630,7 +724,11 @@ final class OracleFallback {
                                     + KitData.quote(t.name())
                                     + " (\n"
                                     + String.join(",\n", lines)
-                                    + "\n)",
+                                    + "\n)"
+                                    // the migrations' physical clause: partitioning and storage
+                                    + (r.physical.containsKey(t.name())
+                                            ? "\n" + r.physical.get(t.name())
+                                            : ""),
                             comments));
         }
         for (String t : r.tables.keySet()) {
@@ -660,7 +758,11 @@ final class OracleFallback {
                             k.refTable(),
                             k.refColumns(),
                             k.systemName(),
-                            oracleConstraint(k)));
+                            oracleConstraint(k)
+                                    + (r.localConstraints.contains(
+                                                    k.name().toUpperCase(Locale.ROOT))
+                                            ? " USING INDEX LOCAL"
+                                            : "")));
         }
         constraints.sort(Comparator.comparing(Constraint::table).thenComparing(Constraint::name));
         List<Index> indexes = new ArrayList<>();
@@ -683,6 +785,23 @@ final class OracleFallback {
                             List.of(),
                             e.getValue().toUpperCase(Locale.ROOT).contains("UNIQUE"),
                             e.getValue()));
+        }
+        // ORA-14016 guard: a LOCAL index or constraint index needs a partitioned table.
+        for (Index i : indexes) {
+            if (LOCAL_INDEX.matcher(i.ddl()).find() && !partitioned(r, i.table())) {
+                throw new IllegalStateException(
+                        "LOCAL index "
+                                + i.name()
+                                + " on "
+                                + i.table()
+                                + ", which the kit does not partition");
+            }
+        }
+        for (Constraint k : constraints) {
+            if (k.ddl().endsWith("USING INDEX LOCAL") && !partitioned(r, k.table())) {
+                throw new IllegalStateException(
+                        "LOCAL constraint " + k.name() + " on " + k.table() + ", not partitioned");
+            }
         }
         // Flyway creates its history table's index itself on Oracle (no migration does).
         indexes.add(
@@ -766,6 +885,15 @@ final class OracleFallback {
                 List.of());
     }
 
+    private static final Pattern LOCAL_INDEX =
+            Pattern.compile("\\)\\s*LOCAL\\b", Pattern.CASE_INSENSITIVE);
+
+    /** Whether the migrations partition {@code table} (its physical clause holds PARTITION BY). */
+    static boolean partitioned(Replay r, String table) {
+        String p = r.physical.get(table);
+        return p != null && p.toUpperCase(Locale.ROOT).contains("PARTITION BY");
+    }
+
     private static Kind kindOf(String oracleType, Kind h2) {
         if (oracleType.startsWith("TIMESTAMP")) {
             return Kind.TIMESTAMP;
@@ -834,7 +962,12 @@ final class OracleFallback {
                 }
                 projected.put(r.key(), new Row(r.key(), v, rel));
             }
-            out.put(t.name(), new TableRows(t.name(), names, kinds, pk, projected, new BitSet()));
+            // A virtual column is computed by Oracle: the data scripts never write it.
+            BitSet generated = new BitSet();
+            for (int i = 0; i < map.length; i++) {
+                generated.set(i, t.columns().get(i).generated());
+            }
+            out.put(t.name(), new TableRows(t.name(), names, kinds, pk, projected, generated));
         }
         return out;
     }

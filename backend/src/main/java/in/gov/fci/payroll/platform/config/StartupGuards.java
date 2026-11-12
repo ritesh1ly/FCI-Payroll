@@ -30,9 +30,58 @@ public class StartupGuards implements InitializingBean {
         this.properties = properties;
     }
 
+    /**
+     * Every Spring profile the application knows (application*.yml, the guards below, the test
+     * profile {@code it}). Spring matches profile names case-sensitively, so a profile written in
+     * another case ("Oracle") or misspelt is silently ignored and its configuration skipped
+     * (owner's DEV run 2026-11-11: application-oracle.yml never loaded): start-up is refused
+     * instead.
+     */
+    static final Set<String> KNOWN_PROFILES =
+            Set.of(
+                    "online",
+                    "batch",
+                    "local",
+                    "dev",
+                    "uat",
+                    "prod",
+                    "demo",
+                    "edge",
+                    "screens",
+                    "volume",
+                    "e2e-parallel",
+                    "oracle",
+                    "oracle-adb",
+                    "shared-h2",
+                    "hrms-mock",
+                    "chaos-monkey",
+                    "it");
+
     @Override
     public void afterPropertiesSet() {
         List<String> profiles = Arrays.asList(environment.getActiveProfiles());
+        for (String p : profiles) {
+            if (KNOWN_PROFILES.contains(p)) {
+                continue;
+            }
+            String expected =
+                    KNOWN_PROFILES.stream()
+                            .filter(k -> k.equalsIgnoreCase(p))
+                            .findFirst()
+                            .orElse(null);
+            throw new IllegalStateException(
+                    expected != null
+                            ? "Unknown profile '"
+                                    + p
+                                    + "': profiles are case-sensitive, write '"
+                                    + expected
+                                    + "' (its configuration is otherwise silently skipped)"
+                            : "Unknown profile '"
+                                    + p
+                                    + "' (known: "
+                                    + KNOWN_PROFILES.stream().sorted().toList()
+                                    + ")");
+        }
         // One WAR, two modes: exactly one of them, so a misconfigured instance can never run the
         // REST API and the scheduler together (or neither).
         boolean online = profiles.contains("online");
